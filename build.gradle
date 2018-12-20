@@ -1,0 +1,41 @@
+group 'FileSorterAutoest'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+mainClassName = 'by.home.fileSorterAutotest.Main'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.springframework', name: 'spring-core', version: '4.3.14.RELEASE'
+    compile group: 'org.springframework', name: 'spring-context', version: '4.3.14.RELEASE'
+    compile group: 'org.springframework', name: 'spring-beans', version: '4.3.14.RELEASE'
+    compile group: 'org.springframework', name: 'spring-aop', version: '4.3.14.RELEASE'
+    compile group: 'commons-logging', name: 'commons-logging', version: 'w1.1.1'
+    compile group: 'com.jcraft', name: 'jsch', version: '0.1.54'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+    compile group: 'commons-io', name: 'commons-io', version: '2.4'
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
+
+
+    testCompile group: 'org.testng', name: 'testng', version: '6.11'
+}
+
+jar {
+    baseName = 'fileSorter-gr'
+    version = '1.0.0'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.5.1'
+}
