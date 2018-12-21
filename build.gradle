@@ -27,8 +27,22 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.4'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
 
+    testCompile group: 'org.springframework', name: 'spring-core', version: '4.3.14.RELEASE'
+    testCompile group: 'org.springframework', name: 'spring-context', version: '4.3.14.RELEASE'
+    testCompile group: 'org.springframework', name: 'spring-beans', version: '4.3.14.RELEASE'
+    testCompile group: 'org.springframework', name: 'spring-aop', version: '4.3.14.RELEASE'
+    testCompile group: 'commons-logging', name: 'commons-logging', version: 'w1.1.1'
+    testCompile group: 'com.jcraft', name: 'jsch', version: '0.1.54'
+    testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    testCompile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
+    testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    testCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+    testCompile group: 'commons-io', name: 'commons-io', version: '2.4'
+    testCompile group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
 
+    testCompile group: 'org.springframework', name: 'spring-test', version: '4.3.18.RELEASE'
     testCompile group: 'org.testng', name: 'testng', version: '6.11'
+
 }
 
 jar {

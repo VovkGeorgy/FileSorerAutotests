@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="suite">
+
+    <parameter name="global_count" value="10" />
+
+    <test name="jsonFilesTest">
+        <parameter name="validJsonFromFolder"  value="D:\\Prog\\projects\\Idea_projects\\FileSorterAutotest\\src\\test\\resources\\testFiles\\json\\valid\\" />
+        <parameter name="notSortedFolderPath"  value="D:\\Prog\\TEMP\\WARNINGTestingZone\\fileSorter\\notSorted\\" />
+        <parameter name="fromSftpStorage"  value="D:\\Prog\\projects\\Idea_projects\\FileSorterAutotest\\src\\test\\resources\\testFiles\\json\\getedFromSftp\\" />
+        <parameter name="jsonSftpValidFolderPath"  value="/jsonFiles/valid/" />
+        <parameter name="notValidJsonFromFolder"  value="D:\\Prog\\projects\\Idea_projects\\FileSorterAutotest\\src\\test\\resources\\testFiles\\json\\notValid\\" />
+        <parameter name="jsonSftpNotValidFolderPath"  value="/jsonFiles/notValid/" />
+        <classes>
+            <class name="by.home.fileSorterAutotest.JsonFilesTest"/>
+        </classes>
+    </test>
+
+    <test name="txtFilesTest">
+        <parameter name="validTxtFromFolder"  value="D:\\Prog\\projects\\Idea_projects\\FileSorterAutotest\\src\\test\\resources\\testFiles\\txt\\valid\\" />
+        <parameter name="notValidTxtFromFolder"  value="D:\\Prog\\projects\\Idea_projects\\FileSorterAutotest\\src\\test\\resources\\testFiles\\txt\\notValid\\" />
+        <parameter name="notSortedFolderPath"  value="D:\\Prog\\TEMP\\WARNINGTestingZone\\fileSorter\\notSorted\\" />
+        <parameter name="validTxtRemoteFolder"  value="D:\\Prog\\TEMP\\WARNINGTestingZone\\fileSorter\\txtFolder\\valid\\" />
+        <parameter name="notValidTxtRemoteFolder"  value="D:\\Prog\\TEMP\\WARNINGTestingZone\\fileSorter\\txtFolder\\notValid\\" />
+        <classes>
+            <class name="by.home.fileSorterAutotest.TxtFilesTest"/>
+        </classes>
+    </test>
+
+</suite>
