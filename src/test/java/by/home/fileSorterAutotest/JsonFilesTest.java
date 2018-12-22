@@ -32,6 +32,7 @@ public class JsonFilesTest {
     public void setUp(String validJsonFromFolder, String notSortedFolderPath,
                       String fromSftpStorage, String jsonSftpValidFolderPath,
                       String notValidJsonFromFolder, String jsonSftpNotValidFolderPath) throws Exception {
+        log.info("Getting parameters from xml");
         fileGetter = new FileGetter();
         fileMover = new FileMover();
         fileFromSFTPGetter = new FileFromSFTPGetter();
@@ -45,6 +46,7 @@ public class JsonFilesTest {
 
     @DataProvider
     public Object[][] jsonSorterTest() {
+        log.info("Starting data provider");
         return new Object[][]{
                 {validJsonFromFolder, notSortedFolderPath, fromSftpStorage, jsonSftpValidFolderPath},
                 {notValidJsonFromFolder, notSortedFolderPath, fromSftpStorage, jsonSftpNotValidFolderPath},
@@ -62,17 +64,26 @@ public class JsonFilesTest {
     @Test(dataProvider = "jsonSorterTest")
     public void jsonFilesSorterTest(String fromFolder, String notSortedFolder,
                                     String fromSftpStorage, String remoteFolder) {
+        log.info("Begin json file test");
+        log.debug("Getting files from local storage");
         List<File> testFileList = fileGetter.getFiles(fromFolder);
+        log.debug("Move files to file sorter working folder");
         fileMover.move(testFileList, fromFolder, notSortedFolder);
         try {
+            log.info("Wait when file sorter working");
             Thread.sleep(4000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        log.debug("Check that file are moved from sorter working folder");
         testFileList.stream().map(file -> new File(notSortedFolder + file.getName())).map(File::exists).forEach(Assert::assertFalse);
+        log.debug("Get files from sftp to local storage");
         fileFromSFTPGetter.getFilesFromSftp(testFileList, remoteFolder, fromSftpStorage);
         List<File> getedFromSftpFiles = fileGetter.getFiles(fromSftpStorage);
+        log.debug("Check that local storage is not empty");
         Assert.assertFalse(getedFromSftpFiles.isEmpty());
+        log.debug("Check that given and gated files are equals");
         Assert.assertNotEquals(testFileList, getedFromSftpFiles);
+        log.info("End test");
     }
 }

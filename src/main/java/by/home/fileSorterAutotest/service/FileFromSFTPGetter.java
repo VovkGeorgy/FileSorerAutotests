@@ -2,6 +2,8 @@ package by.home.fileSorterAutotest.service;
 
 import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -24,9 +26,9 @@ public class FileFromSFTPGetter {
     /**
      * Download files from sftp server
      *
-     * @param fileList files which need get from sftp
+     * @param fileList   files which need get from sftp
      * @param fromFolder folder were need find files
-     * @param toFolder folder where need put files
+     * @param toFolder   folder where need put files
      */
     public void getFilesFromSftp(List<File> fileList, String fromFolder, String toFolder) {
         JSch jsch = new JSch();
