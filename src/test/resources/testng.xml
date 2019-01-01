@@ -4,7 +4,7 @@
 
     <parameter name="notSortedFolderPath" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/notSorted/"/>
     <test name="jsonFilesTest">
-        <parameter name="fromSftpStorage" value="testFiles/json/getedFromSftp/"/>
+        <parameter name="fromSftpStorage" value="/testFiles/json/getedFromSftp/"/>
         <parameter name="ftpUsername" value="admin"/>
         <parameter name="ftpPassword" value="11111"/>
         <parameter name="ftpHost" value="0.0.0.0"/>

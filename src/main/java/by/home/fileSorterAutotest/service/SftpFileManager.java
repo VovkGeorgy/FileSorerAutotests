@@ -2,10 +2,8 @@ package by.home.fileSorterAutotest.service;
 
 import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.ResourceUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
@@ -30,13 +28,13 @@ public class SftpFileManager {
         try {
             ChannelSftp sftpChannel = configSftpChannel(sftpConfigMap);
             log.info("Upload files to server");
-            File folder = ResourceUtils.getFile("classpath:" + toFolder);
+            File folder = new File(this.getClass().getResource(toFolder).getFile());
             for (File file : fileList) {
                 sftpChannel.get(fromFolder + file.getName(), folder.getPath() + "/" + file.getName());
             }
         } catch (JSchException | SftpException e) {
             log.error("SFTP Connection exception {}", e.getMessage());
-        } catch (NullPointerException | FileNotFoundException nul) {
+        } catch (NullPointerException nul) {
             log.debug("Something are not found", nul.getMessage());
         } finally {
             log.info("Close server connection");

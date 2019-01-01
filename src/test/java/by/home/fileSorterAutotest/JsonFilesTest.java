@@ -44,8 +44,8 @@ public class JsonFilesTest {
     public Object[][] jsonSorterTest() {
         log.info("Starting data provider");
         return new Object[][]{
-                {"testFiles/json/valid/", "/jsonFiles/valid/"},
-                {"testFiles/json/notValid/", "/jsonFiles/notValid/"},
+                {"/testFiles/json/valid/", "/jsonFiles/valid/"},
+                {"/testFiles/json/notValid/", "/jsonFiles/notValid/"},
         };
     }
 

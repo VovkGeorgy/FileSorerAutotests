@@ -26,8 +26,8 @@ public class TxtFilesTest {
     public Object[][] txtSorterTest() {
         log.info("Starting data provider");
         return new Object[][]{
-                {"testFiles/txt/valid/", "D:/Prog/TEMP/WARNINGTestingZone/fileSorter/txtFolder/valid/"},
-                {"testFiles/txt/notValid/", "D:/Prog/TEMP/WARNINGTestingZone/fileSorter/txtFolder/notValid/"},
+                {"/testFiles/txt/valid/", "D:/Prog/TEMP/WARNINGTestingZone/fileSorter/txtFolder/valid/"},
+                {"/testFiles/txt/notValid/", "D:/Prog/TEMP/WARNINGTestingZone/fileSorter/txtFolder/notValid/"},
         };
     }
 
@@ -37,7 +37,7 @@ public class TxtFilesTest {
      * @param fromFolder   folder from which copied files
      * @param remoteFolder folder were sorter put files
      */
-    @Test(dataProvider = "txtSorterTest", enabled = false)
+    @Test(dataProvider = "txtSorterTest")
     public void txtFilesSorterTest(String fromFolder, String remoteFolder) throws InterruptedException {
         List<File> testFileList = localFileManager.getResources(fromFolder);
         localFileManager.move(testFileList, notSortedFolderPath);
