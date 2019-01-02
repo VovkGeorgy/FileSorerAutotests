@@ -2,9 +2,10 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="suite">
 
-    <parameter name="notSortedFolderPath" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/notSorted/"/>
+    <parameter name="sorterInputFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/notSorted/"/>
+
     <test name="jsonFilesTest">
-        <parameter name="fromSftpStorage" value="/testFiles/json/getedFromSftp/"/>
+        <parameter name="errorStorageFolder" value="/testFiles/json/fromSftpStorage/"/>
         <parameter name="ftpUsername" value="admin"/>
         <parameter name="ftpPassword" value="11111"/>
         <parameter name="ftpHost" value="0.0.0.0"/>
@@ -18,6 +19,7 @@
     </test>
 
     <test name="txtFilesTest">
+        <parameter name="exceptionFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/exceptionFolder/"/>
         <classes>
             <class name="by.home.fileSorterAutotest.TxtFilesTest"/>
         </classes>
