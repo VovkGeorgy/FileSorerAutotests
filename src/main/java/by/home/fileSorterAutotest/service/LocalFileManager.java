@@ -20,17 +20,17 @@ import java.util.stream.Stream;
 public class LocalFileManager {
 
     /**
-     * Move files in list to target path
+     * Copy files in list to target path
      *
      * @param fileList list of files
      * @param toFolder to path
      */
-    public void move(List<File> fileList, String toFolder) {
+    public void copy(List<File> fileList, String toFolder) {
         File targetDirectory = new File(toFolder);
         fileList.forEach(file -> {
             try {
-                log.debug("Try to move file {}, to {}", file.getPath(), toFolder);
-                FileUtils.moveFileToDirectory(file, targetDirectory, false);
+                log.debug("Try to copy file {}, to {}", file.getPath(), toFolder);
+                FileUtils.copyFileToDirectory(file, targetDirectory, false);
             } catch (IOException e) {
                 log.error("Get exception with moving files from {}, to {}, exception {}", file.getPath(), toFolder, e.getMessage());
             }
@@ -62,14 +62,10 @@ public class LocalFileManager {
      * @param folderPath target folder
      */
     public void waitFilesTransfer(List<File> fileList, String folderPath) {
-        while (isFilesExist(fileList, folderPath)) {
-            log.debug("Wait when sorter move files from {}", fileList);
-        }
-    }
-
-    private boolean isFilesExist(List<File> testFileList, String folderPath) {
-        boolean filesExist = false;
-        for (File file : testFileList) filesExist = new File(folderPath + file.getName()).exists() || filesExist;
-        return filesExist;
+        log.debug("Wait when sorter copy files from {}", folderPath);
+        boolean isFilesExist = false;
+        do {
+            for (File file : fileList) isFilesExist = new File(folderPath + file.getName()).exists() || isFilesExist;
+        } while (isFilesExist);
     }
 }

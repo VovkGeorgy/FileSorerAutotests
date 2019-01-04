@@ -35,7 +35,7 @@ public class SftpFileManager {
      * @param fromFolder folder were need find files
      * @param toFolder   folder where need put files
      */
-    public void moveFilesFromSftp(List<File> fileList, String fromFolder, String toFolder) {
+    public void downloadFilesFromSftp(List<File> fileList, String fromFolder, String toFolder) {
         try {
             ChannelSftp sftpChannel = configSftpChannel(sftpConfigMap);
             log.info("Upload files to server");

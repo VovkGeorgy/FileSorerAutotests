@@ -44,7 +44,7 @@ public class TxtFilesTest {
     @Test(dataProvider = "txtSorterTest", timeOut = 8000)
     public void txtFilesSorterTest(String fromFolder, String sorterFolder) {
         List<File> testFileList = localFileManager.getFiles(fromFolder, true);
-        localFileManager.move(testFileList, sorterInputFolder);
+        localFileManager.copy(testFileList, sorterInputFolder);
         localFileManager.waitFilesTransfer(testFileList, sorterInputFolder);
         List<File> processedFiles = localFileManager.getFiles(sorterFolder, false);
         Assert.assertFalse(processedFiles.isEmpty(), "Not found needed files in folder " + sorterFolder);

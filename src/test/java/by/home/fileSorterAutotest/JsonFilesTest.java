@@ -53,9 +53,9 @@ public class JsonFilesTest {
     @Test(dataProvider = "jsonSorterTest", timeOut = 8000)
     public void jsonFilesSorterTest(String fromFolder, String remoteFolder) {
         List<File> testFileList = localFileManager.getFiles(fromFolder, true);
-        localFileManager.move(testFileList, sorterInputFolder);
+        localFileManager.copy(testFileList, sorterInputFolder);
         localFileManager.waitFilesTransfer(testFileList, sorterInputFolder);
-        sftpFileManager.moveFilesFromSftp(testFileList, remoteFolder, errorStorageFolder);
+        sftpFileManager.downloadFilesFromSftp(testFileList, remoteFolder, errorStorageFolder);
         List<File> fromSftpFiles = localFileManager.getFiles(errorStorageFolder, true);
         Assert.assertFalse(fromSftpFiles.isEmpty(), "There is no files on sftp");
         Assert.assertNotEquals(testFileList, fromSftpFiles, "Files received from sftp are not equals");
