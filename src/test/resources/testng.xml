@@ -4,8 +4,8 @@
 
     <parameter name="sorterInputFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/notSorted/"/>
 
-    <test name="jsonFilesTest">
-        <parameter name="errorStorageFolder" value="/testFiles/json/fromSftpStorage/"/>
+    <test name="errorReportTest">
+        <parameter name="errorStorageFolder" value="/testReports/error/fromSftpStorage/"/>
         <parameter name="ftpUsername" value="admin"/>
         <parameter name="ftpPassword" value="11111"/>
         <parameter name="ftpHost" value="0.0.0.0"/>
@@ -14,14 +14,14 @@
         <parameter name="ftpHostKeyCheckingValue" value="no"/>
         <parameter name="ftpChanelType" value="sftp"/>
         <classes>
-            <class name="by.home.fileSorterAutotest.JsonFilesTest"/>
+            <class name="by.home.fileSorterAutotest.ErrorReportTest"/>
         </classes>
     </test>
 
-    <test name="txtFilesTest">
+    <test name="exceptionReportTest">
         <parameter name="exceptionFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/exceptionFolder/"/>
         <classes>
-            <class name="by.home.fileSorterAutotest.TxtFilesTest"/>
+            <class name="by.home.fileSorterAutotest.ExceptionReportTest"/>
         </classes>
     </test>
 

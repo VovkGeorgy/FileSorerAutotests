@@ -3,16 +3,19 @@ package by.home.fileSorterAutotest;
 import by.home.fileSorterAutotest.service.LocalFileManager;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.util.List;
 
 /**
- * Class with tests for txt files sorter
+ * Class with tests for exception files sorter
  */
 @Slf4j
-public class TxtFilesTest {
+public class ExceptionReportTest {
 
     private LocalFileManager localFileManager;
     private String sorterInputFolder;
@@ -27,25 +30,25 @@ public class TxtFilesTest {
     }
 
     @DataProvider
-    public Object[][] txtSorterTest() {
+    public Object[][] exceptionReportTest() {
         log.info("Starting data provider");
         return new Object[][]{
-                {"/testFiles/txt/valid/", exceptionFolder + "valid/"},
-                {"/testFiles/txt/notValid/", exceptionFolder + "notValid/"},
+                {"/testReports/exception/valid/", exceptionFolder + "valid/"},
+                {"/testReports/exception/notValid/", exceptionFolder + "notValid/"},
         };
     }
 
     /**
-     * Test sorter with txt files
+     * Test sorter with exception files
      *
-     * @param fromFolder   folder from which get test files
+     * @param targetFolder folder from which get test files
      * @param sorterFolder folder were sorter must put processed files
      */
-    @Test(dataProvider = "txtSorterTest", timeOut = 8000)
-    public void txtFilesSorterTest(String fromFolder, String sorterFolder) {
-        List<File> testFileList = localFileManager.getFiles(fromFolder, true);
+    @Test(dataProvider = "exceptionReportTest", timeOut = 5000)
+    public void txtFilesSorterTest(String targetFolder, String sorterFolder) {
+        List<File> testFileList = localFileManager.getFiles(targetFolder, true);
         localFileManager.copy(testFileList, sorterInputFolder);
-        localFileManager.waitFilesTransfer(testFileList, sorterInputFolder);
+        localFileManager.waitFilesTransfer(sorterInputFolder);
         List<File> processedFiles = localFileManager.getFiles(sorterFolder, false);
         Assert.assertFalse(processedFiles.isEmpty(), "Not found needed files in folder " + sorterFolder);
         Assert.assertNotEquals(testFileList, processedFiles, "Files received from sftp are not equals");

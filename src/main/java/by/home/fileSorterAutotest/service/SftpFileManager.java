@@ -31,39 +31,40 @@ public class SftpFileManager {
     /**
      * Move files from sftp server
      *
-     * @param fileList   files which need get from sftp
-     * @param fromFolder folder were need find files
-     * @param toFolder   folder where need put files
+     * @param fileList     files which need get from sftp
+     * @param fromFolder   folder were need find files
+     * @param toFolderPath folder where need put files
      */
-    public void downloadFilesFromSftp(List<File> fileList, String fromFolder, String toFolder) {
+    public void downloadFilesFromSftp(List<File> fileList, String fromFolder, String toFolderPath) {
         try {
             ChannelSftp sftpChannel = configSftpChannel(sftpConfigMap);
-            log.info("Upload files to server");
-            File folder = new File(this.getClass().getResource(toFolder).getFile());
+            log.info("Download {} files from server", fileList.size());
+            File toFolder = new File(this.getClass().getResource(toFolderPath).getFile());
             for (File file : fileList) {
-                sftpChannel.get(fromFolder + file.getName(), folder.getPath() + "/" + file.getName());
+                log.debug("Download file {} from server folder {}, to local folder {}", file.getName(), fromFolder, toFolderPath);
+                sftpChannel.get(fromFolder + file.getName(), toFolder.getPath() + "/" + file.getName());
             }
-        } catch (JSchException | SftpException e) {
-            log.error("SFTP Connection exception {}", e.getMessage());
+        } catch (JSchException | SftpException | NullPointerException e) {
+            log.error("SFTP Connection process exception {}", e.getMessage());
         } finally {
             sftpChannel.exit();
             log.info("Close server connection");
             if (session != null) session.disconnect();
-            else log.debug("Connection session is NULL");
+            else log.debug("Cant close session, is already NULL");
         }
     }
 
     private ChannelSftp configSftpChannel(Map<String, String> sftpConfigMap) throws JSchException {
-        session = new JSch().getSession(sftpConfigMap.get("ftpUsername"), sftpConfigMap.get("ftpHost"), Integer.parseInt(sftpConfigMap.get("ftpPort")));
+        log.info("Open server connection to {}", sftpConfigMap.get("ftpHost"));
+        session = new JSch().getSession(sftpConfigMap.get("ftpUsername"), sftpConfigMap.get("ftpHost"), Integer.parseInt
+                (sftpConfigMap.get("ftpPort")));
         session.setConfig(sftpConfigMap.get("ftpHostKeyChecking"), sftpConfigMap.get("ftpHostKeyCheckingValue"));
         session.setPassword(sftpConfigMap.get("ftpPassword"));
-        log.debug("Try to connect to session {}", session);
         session.connect();
         Channel channel = session.openChannel(sftpConfigMap.get("ftpChanelType"));
-        log.debug("Try to connect to chanel {}", channel);
         channel.connect();
         sftpChannel = (ChannelSftp) channel;
-        log.debug("Connecting to server is established");
+        log.debug("Connecting to {} : {} server is established", sftpConfigMap.get("ftpHost"), sftpConfigMap.get("ftpPort"));
         return sftpChannel;
     }
 }

@@ -4,10 +4,7 @@ import by.home.fileSorterAutotest.service.LocalFileManager;
 import by.home.fileSorterAutotest.service.SftpFileManager;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.io.File;
 import java.util.List;
@@ -16,7 +13,7 @@ import java.util.List;
  * Class test sorter of files
  */
 @Slf4j
-public class JsonFilesTest {
+public class ErrorReportTest {
 
     private LocalFileManager localFileManager;
     private SftpFileManager sftpFileManager;
@@ -35,26 +32,32 @@ public class JsonFilesTest {
         this.errorStorageFolder = errorStorageFolder;
     }
 
+    @Parameters({"errorStorageFolder"})
+    @AfterMethod
+    public void tempCleaning(String cleaningDirectory) {
+        localFileManager.cleanDirectory(cleaningDirectory, true);
+    }
+
     @DataProvider
-    public Object[][] jsonSorterTest() {
+    public Object[][] errorReportTest() {
         log.info("Starting data provider");
         return new Object[][]{
-                {"/testFiles/json/valid/", "/errorFiles/valid/"},
-                {"/testFiles/json/notValid/", "/errorFiles/notValid/"},
+                {"/testReports/error/valid/", "/errorFiles/valid/"},
+                {"/testReports/error/notValid/", "/errorFiles/notValid/"},
         };
     }
 
     /**
-     * Test sorter with json files
+     * Test sorter with error files
      *
      * @param fromFolder   folder from which copied files
      * @param remoteFolder sftp folder were sorter put files
      */
-    @Test(dataProvider = "jsonSorterTest", timeOut = 8000)
+    @Test(dataProvider = "errorReportTest", timeOut = 5000)
     public void jsonFilesSorterTest(String fromFolder, String remoteFolder) {
         List<File> testFileList = localFileManager.getFiles(fromFolder, true);
         localFileManager.copy(testFileList, sorterInputFolder);
-        localFileManager.waitFilesTransfer(testFileList, sorterInputFolder);
+        localFileManager.waitFilesTransfer(sorterInputFolder);
         sftpFileManager.downloadFilesFromSftp(testFileList, remoteFolder, errorStorageFolder);
         List<File> fromSftpFiles = localFileManager.getFiles(errorStorageFolder, true);
         Assert.assertFalse(fromSftpFiles.isEmpty(), "There is no files on sftp");
