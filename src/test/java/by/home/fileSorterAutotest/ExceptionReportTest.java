@@ -44,7 +44,7 @@ public class ExceptionReportTest {
      * @param targetFolder folder from which get test files
      * @param sorterFolder folder were sorter must put processed files
      */
-    @Test(dataProvider = "exceptionReportTest", timeOut = 5000)
+    @Test(dataProvider = "exceptionReportTest")
     public void txtFilesSorterTest(String targetFolder, String sorterFolder) {
         List<File> testFileList = localFileManager.getFiles(targetFolder, true);
         localFileManager.copy(testFileList, sorterInputFolder);
