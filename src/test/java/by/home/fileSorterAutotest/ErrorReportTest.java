@@ -33,9 +33,9 @@ public class ErrorReportTest {
     }
 
     @Parameters({"errorStorageFolder"})
-    @AfterMethod
-    public void tempCleaning(String cleaningDirectory) {
-        localFileManager.cleanDirectory(cleaningDirectory, true);
+    @BeforeMethod
+    public void clean(String errorStorageFolder) {
+        localFileManager.cleanDirectory(errorStorageFolder, true);
     }
 
     @DataProvider
@@ -53,14 +53,14 @@ public class ErrorReportTest {
      * @param fromFolder   folder from which copied files
      * @param remoteFolder sftp folder were sorter put files
      */
-    @Test(dataProvider = "errorReportTest", timeOut = 5000)
+    @Test(dataProvider = "errorReportTest")
     public void jsonFilesSorterTest(String fromFolder, String remoteFolder) {
-        List<File> testFileList = localFileManager.getFiles(fromFolder, true);
-        localFileManager.copy(testFileList, sorterInputFolder);
+        List<File> errorReportsList = localFileManager.getFiles(fromFolder, true);
+        localFileManager.copy(errorReportsList, sorterInputFolder);
         localFileManager.waitFilesTransfer(sorterInputFolder);
-        sftpFileManager.downloadFilesFromSftp(testFileList, remoteFolder, errorStorageFolder);
+        sftpFileManager.downloadFilesFromSftp(errorReportsList, remoteFolder, errorStorageFolder, true);
         List<File> fromSftpFiles = localFileManager.getFiles(errorStorageFolder, true);
         Assert.assertFalse(fromSftpFiles.isEmpty(), "There is no files on sftp");
-        Assert.assertNotEquals(testFileList, fromSftpFiles, "Files received from sftp are not equals");
+        Assert.assertNotEquals(errorReportsList, fromSftpFiles, "Files received from sftp are not equals");
     }
 }
