@@ -48,7 +48,7 @@ public class ExceptionReportTest {
     public void txtFilesSorterTest(String targetFolder, String sorterFolder) {
         List<File> testFileList = localFileManager.getFiles(targetFolder, true);
         localFileManager.copy(testFileList, sorterInputFolder);
-        localFileManager.waitFilesTransfer(sorterInputFolder);
+        localFileManager.waitFilesTransfer(sorterFolder);
         List<File> processedFiles = localFileManager.getFiles(sorterFolder, false);
         Assert.assertFalse(processedFiles.isEmpty(), "Not found needed files in folder " + sorterFolder);
         Assert.assertNotEquals(testFileList, processedFiles, "Files received from sftp are not equals");

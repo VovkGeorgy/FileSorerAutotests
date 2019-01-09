@@ -6,10 +6,6 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,12 +63,18 @@ public class LocalFileManager {
      * @param folderPath target folder
      */
     public void waitFilesTransfer(String folderPath) {
-        log.info("Wait when sorter copy files from {}", folderPath);
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(folderPath))) {
-            if (dirStream.iterator().hasNext()) waitFilesTransfer(folderPath);
-        } catch (IOException e) {
-            log.error("Get exception \n {} with waiting file transfer in folder {}", e.getMessage(), folderPath);
-        }
+        boolean folderIsEmpty = true;
+        log.info("Wait when folder {} will not empty ", folderPath);
+        do {
+            try {
+                File targetFolder = new File(folderPath);
+                Thread.sleep(1000);
+                File[] listFiles = targetFolder.listFiles();
+                folderIsEmpty = (listFiles != null ? listFiles.length : 0) == 0;
+            } catch (InterruptedException e) {
+                log.error("Get exception \n {} with waiting file transfer in folder {}", e.getMessage(), folderPath);
+            }
+        } while (folderIsEmpty);
     }
 
     /**
