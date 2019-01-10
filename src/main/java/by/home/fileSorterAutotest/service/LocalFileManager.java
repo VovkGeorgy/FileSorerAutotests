@@ -58,27 +58,51 @@ public class LocalFileManager {
     }
 
     /**
-     * Method wait when files are moved from folder
+     * Method wait when files are moved from folder or appear
      *
-     * @param folderPath target folder
+     * @param folderPath        target folder
+     * @param maxWaitingTime    max times for scanning folder
+     * @param folderMustBeEmpty folder must be empty or not
+     * @return is target folder empty
      */
-    public void waitFilesTransfer(String folderPath) {
-        boolean folderIsEmpty = true;
-        log.info("Wait when folder {} will not empty ", folderPath);
+    public boolean waitFilesTransfer(String folderPath, int maxWaitingTime, boolean folderMustBeEmpty) {
+        try {
+            File targetFolder = new File(folderPath);
+            log.info("Wait when folder {} will not empty ", folderPath);
+            return folderMustBeEmpty ? waitWhenFolderIsEmpty(maxWaitingTime, targetFolder) : waitWhenFolderIsNotEmpty
+                    (maxWaitingTime, targetFolder);
+        } catch (InterruptedException | NullPointerException e) {
+            log.error("Get exception \n {} with waiting file transfer in folder {}", e.getMessage(), folderPath);
+            return false;
+        }
+    }
+
+    private boolean waitWhenFolderIsEmpty(int maxWaitingTime, File targetFolder) throws
+            InterruptedException {
+        int waitingTime = 1;
+        boolean folderIsEmpty;
         do {
-            try {
-                File targetFolder = new File(folderPath);
-                Thread.sleep(1000);
-                File[] listFiles = targetFolder.listFiles();
-                folderIsEmpty = (listFiles != null ? listFiles.length : 0) == 0;
-            } catch (InterruptedException e) {
-                log.error("Get exception \n {} with waiting file transfer in folder {}", e.getMessage(), folderPath);
-            }
-        } while (folderIsEmpty);
+            File[] listFiles = targetFolder.listFiles();
+            Thread.sleep(1000);
+            folderIsEmpty = (listFiles != null ? listFiles.length : 0) == 0;
+        } while (!folderIsEmpty & waitingTime++ < maxWaitingTime);
+        return folderIsEmpty;
+    }
+
+    private boolean waitWhenFolderIsNotEmpty(int maxWaitingTime, File targetFolder) throws
+            InterruptedException {
+        int waitingTime = 1;
+        boolean folderIsEmpty;
+        do {
+            File[] listFiles = targetFolder.listFiles();
+            Thread.sleep(1000);
+            folderIsEmpty = (listFiles != null ? listFiles.length : 0) == 0;
+        } while (folderIsEmpty & waitingTime++ < maxWaitingTime);
+        return folderIsEmpty;
     }
 
     /**
-     * Method chen target directory
+     * Method clean target directory
      *
      * @param directoryPath path of cleaning directory
      */

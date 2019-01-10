@@ -20,13 +20,15 @@ public class ExceptionReportTest {
     private LocalFileManager localFileManager;
     private String sorterInputFolder;
     private String exceptionFolder;
+    private int maxWaitingTime;
 
-    @Parameters({"sorterInputFolder", "exceptionFolder"})
+    @Parameters({"sorterInputFolder", "exceptionFolder", "maxWaitingTime"})
     @BeforeClass
-    public void setUp(String sorterInputFolder, String exceptionFolder) {
+    public void setUp(String sorterInputFolder, String exceptionFolder, String maxWaitingTime) {
         this.localFileManager = new LocalFileManager();
         this.sorterInputFolder = sorterInputFolder;
         this.exceptionFolder = exceptionFolder;
+        this.maxWaitingTime = Integer.parseInt(maxWaitingTime);
     }
 
     @DataProvider
@@ -48,7 +50,8 @@ public class ExceptionReportTest {
     public void txtFilesSorterTest(String targetFolder, String sorterFolder) {
         List<File> testFileList = localFileManager.getFiles(targetFolder, true);
         localFileManager.copy(testFileList, sorterInputFolder);
-        localFileManager.waitFilesTransfer(sorterFolder);
+        Assert.assertFalse(localFileManager.waitFilesTransfer(sorterFolder, maxWaitingTime, false), "Files not found to " +
+                "output sorter folder");
         List<File> processedFiles = localFileManager.getFiles(sorterFolder, false);
         Assert.assertFalse(processedFiles.isEmpty(), "Not found needed files in folder " + sorterFolder);
         Assert.assertNotEquals(testFileList, processedFiles, "Files received from sftp are not equals");

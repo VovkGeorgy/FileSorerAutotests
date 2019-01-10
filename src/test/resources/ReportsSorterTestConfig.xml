@@ -3,6 +3,7 @@
 <suite name="suite">
 
     <parameter name="sorterInputFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/notSorted/"/>
+    <parameter name="maxWaitingTime" value="5"/>
 
     <test name="errorReportTest">
         <parameter name="errorStorageFolder" value="/testReports/error/fromSftpStorage/"/>

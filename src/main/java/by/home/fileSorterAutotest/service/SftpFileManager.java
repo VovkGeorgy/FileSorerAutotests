@@ -4,11 +4,6 @@ import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,14 +75,5 @@ public class SftpFileManager {
         sftpChannel.exit();
         if (session != null) session.disconnect();
         else log.debug("Cant close session, is already NULL");
-    }
-
-    public void waitFileTransfer(String targetFolderPath) {
-        boolean folderIsEmpty = true;
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(targetFolderPath))) {
-            folderIsEmpty = !dirStream.iterator().hasNext();
-        } catch (IOException | NullPointerException e) {
-            log.error("Get exception \n {} with waiting file transfer in folder {}", e.getMessage(), targetFolderPath);
-        }
     }
 }

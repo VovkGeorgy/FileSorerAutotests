@@ -19,17 +19,20 @@ public class ErrorReportTest {
     private SftpFileManager sftpFileManager;
     private String sorterInputFolder;
     private String errorStorageFolder;
+    private int maxWaitingTime;
 
     @Parameters({"sorterInputFolder", "errorStorageFolder", "ftpUsername", "ftpPassword", "ftpHost",
-            "ftpPort", "ftpHostKeyChecking", "ftpHostKeyCheckingValue", "ftpChanelType"})
+            "ftpPort", "ftpHostKeyChecking", "ftpHostKeyCheckingValue", "ftpChanelType", "maxWaitingTime"})
     @BeforeClass
     public void setUp(String sorterInputFolder, String errorStorageFolder, String ftpUsername, String ftpPassword, String ftpHost,
-                      String ftpPort, String ftpHostKeyChecking, String ftpHostKeyCheckingValue, String ftpChanelType) {
+                      String ftpPort, String ftpHostKeyChecking, String ftpHostKeyCheckingValue, String ftpChanelType, String
+                              maxWaitingTime) {
         this.localFileManager = new LocalFileManager();
         this.sftpFileManager = new SftpFileManager(ftpUsername, ftpPassword, ftpHost, ftpPort,
                 ftpHostKeyChecking, ftpHostKeyCheckingValue, ftpChanelType);
         this.sorterInputFolder = sorterInputFolder;
         this.errorStorageFolder = errorStorageFolder;
+        this.maxWaitingTime = Integer.parseInt(maxWaitingTime);
     }
 
     @Parameters({"errorStorageFolder"})
@@ -57,7 +60,8 @@ public class ErrorReportTest {
     public void jsonFilesSorterTest(String fromFolder, String remoteFolder) {
         List<File> errorReportsList = localFileManager.getFiles(fromFolder, true);
         localFileManager.copy(errorReportsList, sorterInputFolder);
-        localFileManager.waitFilesTransfer(sorterInputFolder);
+        Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, true), "Files are moved " +
+                "sorter input folder {}" + sorterInputFolder);
         sftpFileManager.downloadFilesFromSftp(errorReportsList, remoteFolder, errorStorageFolder, true);
         List<File> fromSftpFiles = localFileManager.getFiles(errorStorageFolder, true);
         Assert.assertFalse(fromSftpFiles.isEmpty(), "There is no files on sftp");
