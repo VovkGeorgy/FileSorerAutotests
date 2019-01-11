@@ -78,26 +78,28 @@ public class LocalFileManager {
     }
 
     private boolean waitWhenFolderIsEmpty(int maxWaitingTime, File targetFolder) throws
-            InterruptedException {
-        int waitingTime = 1;
+            InterruptedException, NullPointerException {
+        long startTime = System.nanoTime();
         boolean folderIsEmpty;
+        double maxMethodTime = maxWaitingTime * Math.pow(10, 9);
         do {
             File[] listFiles = targetFolder.listFiles();
-            Thread.sleep(1000);
+            Thread.sleep(500);
             folderIsEmpty = (listFiles != null ? listFiles.length : 0) == 0;
-        } while (!folderIsEmpty & waitingTime++ < maxWaitingTime);
+        } while (!folderIsEmpty & System.nanoTime() < startTime + maxMethodTime);
         return folderIsEmpty;
     }
 
     private boolean waitWhenFolderIsNotEmpty(int maxWaitingTime, File targetFolder) throws
-            InterruptedException {
-        int waitingTime = 1;
+            InterruptedException, NullPointerException {
+        long startTime = System.nanoTime();
         boolean folderIsEmpty;
+        double maxMethodTime = maxWaitingTime * Math.pow(10, 9);
         do {
             File[] listFiles = targetFolder.listFiles();
-            Thread.sleep(1000);
+            Thread.sleep(500);
             folderIsEmpty = (listFiles != null ? listFiles.length : 0) == 0;
-        } while (folderIsEmpty & waitingTime++ < maxWaitingTime);
+        } while (folderIsEmpty & System.nanoTime() < startTime + maxMethodTime);
         return folderIsEmpty;
     }
 
