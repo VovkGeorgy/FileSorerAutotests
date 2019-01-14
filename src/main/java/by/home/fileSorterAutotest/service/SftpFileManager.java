@@ -3,10 +3,9 @@ package by.home.fileSorterAutotest.service;
 import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * Class have method those get files from sftp
@@ -30,25 +29,22 @@ public class SftpFileManager {
     }
 
     /**
-     * Move files from sftp server
+     * Download files from sftp server
      *
-     * @param fileList            files which need get from sftp
      * @param fromFolderPath      folder path where need find files
-     * @param toFolderPath        folder path where need put files
+     * @param toFolderPath        folder path where need download files
      * @param downloadToResources show that files must downloaded to resources
      */
-    public void downloadFilesFromSftp(List<File> fileList, String fromFolderPath, String toFolderPath, boolean
-            downloadToResources) {
+    public void downloadFilesFromSftp(String fromFolderPath, String toFolderPath, boolean downloadToResources) {
         try {
             toFolderPath = downloadToResources ? resourcesUtil.getResourcesPath(toFolderPath) :
                     toFolderPath;
             ChannelSftp sftpChannel = configSftpChannel(sftpConfigMap);
-            log.info("Download {} files from server", fileList.size());
-            for (File file : fileList) {
-                String fileName = file.getName();
-                log.debug("Download file {} from folder {}, to folder {}", fileName, fromFolderPath,
-                        toFolderPath);
-                sftpChannel.get(fromFolderPath + fileName, toFolderPath + fileName);
+            log.debug("Download files from folder {}, to folder {}", fromFolderPath, toFolderPath);
+            sftpChannel.cd(fromFolderPath);
+            Vector<ChannelSftp.LsEntry> list = sftpChannel.ls("*");
+            for (ChannelSftp.LsEntry listEntry : list) {
+                sftpChannel.get(listEntry.getFilename(), toFolderPath);
             }
         } catch (JSchException | SftpException | NullPointerException e) {
             log.error("SFTP Connection process exception {}", e.getMessage());

@@ -20,18 +20,18 @@ public class LocalFileManager {
     /**
      * Copy files in list to target path
      *
-     * @param fileList      list of files
-     * @param outFolderPath path to output folder
+     * @param fileList         list of files
+     * @param targetFolderPath path to output folder
      */
-    public void copy(List<File> fileList, String outFolderPath) {
-        log.debug("Copy {} files to folder {}", fileList.size(), outFolderPath);
-        File outFolder = new File(outFolderPath);
+    public void copy(List<File> fileList, String targetFolderPath) {
+        log.debug("Copy {} files to folder {}", fileList.size(), targetFolderPath);
         fileList.forEach(file -> {
             try {
-                log.info("Try to copy file {}, to {}", file.getPath(), outFolderPath);
-                FileUtils.copyFileToDirectory(file, outFolder, false);
+                log.info("Try to copy file \n {}, to \n{}", file.getPath(), targetFolderPath);
+                FileUtils.copyFileToDirectory(file, new File(targetFolderPath), false);
             } catch (IOException e) {
-                log.error("Get exception with moving files from {}, to {}, exception {}", file.getPath(), outFolderPath, e
+                log.error("Get exception with moving files from \n{}, to \n{}, exception \n{}", file.getPath(),
+                        targetFolderPath, e
                         .getMessage());
             }
         });
@@ -48,11 +48,11 @@ public class LocalFileManager {
         try {
             String folderPath = isResources ? resourcesUtil.getResourcesPath(targetFolderPath) :
                     targetFolderPath;
-            log.info("Try to get files from path {}", targetFolderPath);
+            log.info("Try to get files from path \n{}", targetFolderPath);
             File targetFolder = new File(folderPath);
             return (List<File>) FileUtils.listFiles(targetFolder, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
         } catch (NullPointerException nul) {
-            log.error("Cant get files from path {}, get exception \n {}", targetFolderPath, nul.getMessage());
+            log.error("Cant get files from path \n{}, get exception \n {}", targetFolderPath, nul.getMessage());
             return new ArrayList<>();
         }
     }
@@ -63,44 +63,24 @@ public class LocalFileManager {
      * @param folderPath        target folder
      * @param maxWaitingTime    max times for scanning folder
      * @param folderMustBeEmpty folder must be empty or not
-     * @return is target folder empty
+     * @return is the target folder empty
      */
     public boolean waitFilesTransfer(String folderPath, int maxWaitingTime, boolean folderMustBeEmpty) {
         try {
+            log.info("Wait when folder {} will isEmpty - {}", folderPath, folderMustBeEmpty);
             File targetFolder = new File(folderPath);
-            log.info("Wait when folder {} will not empty ", folderPath);
-            return folderMustBeEmpty ? waitWhenFolderIsEmpty(maxWaitingTime, targetFolder) : waitWhenFolderIsNotEmpty
-                    (maxWaitingTime, targetFolder);
+            double maxMethodTime = System.nanoTime() + maxWaitingTime * Math.pow(10, 9);
+            boolean folderIsEmpty;
+            do {
+                File[] listFiles = targetFolder.listFiles();
+                Thread.sleep(500);
+                folderIsEmpty = (listFiles != null ? listFiles.length : 0) == 0;
+            } while (!(folderIsEmpty == folderMustBeEmpty) && System.nanoTime() < maxMethodTime);
+            return folderIsEmpty;
         } catch (InterruptedException | NullPointerException e) {
-            log.error("Get exception \n {} with waiting file transfer in folder {}", e.getMessage(), folderPath);
+            log.error("Get exception \n {} with waiting file transfer in folder \n{}", e.getMessage(), folderPath);
             return false;
         }
-    }
-
-    private boolean waitWhenFolderIsEmpty(int maxWaitingTime, File targetFolder) throws
-            InterruptedException, NullPointerException {
-        long startTime = System.nanoTime();
-        boolean folderIsEmpty;
-        double maxMethodTime = maxWaitingTime * Math.pow(10, 9);
-        do {
-            File[] listFiles = targetFolder.listFiles();
-            Thread.sleep(500);
-            folderIsEmpty = (listFiles != null ? listFiles.length : 0) == 0;
-        } while (!folderIsEmpty & System.nanoTime() < startTime + maxMethodTime);
-        return folderIsEmpty;
-    }
-
-    private boolean waitWhenFolderIsNotEmpty(int maxWaitingTime, File targetFolder) throws
-            InterruptedException, NullPointerException {
-        long startTime = System.nanoTime();
-        boolean folderIsEmpty;
-        double maxMethodTime = maxWaitingTime * Math.pow(10, 9);
-        do {
-            File[] listFiles = targetFolder.listFiles();
-            Thread.sleep(500);
-            folderIsEmpty = (listFiles != null ? listFiles.length : 0) == 0;
-        } while (folderIsEmpty & System.nanoTime() < startTime + maxMethodTime);
-        return folderIsEmpty;
     }
 
     /**
