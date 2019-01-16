@@ -2,12 +2,12 @@ package by.home.fileSorterAutotest;
 
 import by.home.fileSorterAutotest.service.LocalFileManager;
 import by.home.fileSorterAutotest.service.SftpFileManager;
+import by.home.fileSorterAutotest.service.utils.FileUtil;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
 import java.io.File;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Class test sorter of files
@@ -17,27 +17,31 @@ public class ErrorReportTest {
     private LocalFileManager localFileManager;
     private SftpFileManager sftpFileManager;
     private String sorterInputFolder;
-    private String errorStorageFolder;
+    private String temporaryFiles;
     private int maxWaitingTime;
 
-    @Parameters({"sorterInputFolder", "errorStorageFolder", "ftpUsername", "ftpPassword", "ftpHost",
+    @Parameters({"sorterInputFolder", "temporaryFiles", "ftpUsername", "ftpPassword", "ftpHost",
             "ftpPort", "ftpHostKeyChecking", "ftpHostKeyCheckingValue", "ftpChanelType", "maxWaitingTime"})
     @BeforeClass
-    public void setUp(String sorterInputFolder, String errorStorageFolder, String ftpUsername, String ftpPassword, String ftpHost,
+    public void setUp(String sorterInputFolder, String temporaryFiles, String ftpUsername, String ftpPassword, String ftpHost,
                       String ftpPort, String ftpHostKeyChecking, String ftpHostKeyCheckingValue, String ftpChanelType, int
                               maxWaitingTime) {
         this.localFileManager = new LocalFileManager();
         this.sftpFileManager = new SftpFileManager(ftpUsername, ftpPassword, ftpHost, ftpPort,
                 ftpHostKeyChecking, ftpHostKeyCheckingValue, ftpChanelType);
         this.sorterInputFolder = sorterInputFolder;
-        this.errorStorageFolder = errorStorageFolder;
+        this.temporaryFiles = temporaryFiles;
         this.maxWaitingTime = maxWaitingTime;
+        localFileManager.cleanDirectory(sorterInputFolder, false);
     }
 
-    @Parameters({"errorStorageFolder"})
+    @Parameters({"temporaryFiles"})
     @BeforeMethod
-    public void clean(String errorStorageFolder) {
-        localFileManager.cleanDirectory(errorStorageFolder, true);
+    @AfterMethod
+    public void clean(String temporaryFiles) {
+        localFileManager.cleanDirectory(temporaryFiles, true);
+        sftpFileManager.cleanDirectory("/errorFiles/valid/");
+        sftpFileManager.cleanDirectory("/errorFiles/notValid/");
     }
 
     @DataProvider
@@ -60,10 +64,10 @@ public class ErrorReportTest {
         localFileManager.copy(errorReportsList, sorterInputFolder);
         Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, true),
                 "Files are not moved from sorter input folder " + sorterInputFolder);
-        sftpFileManager.downloadFilesFromSftp(remoteFolder, errorStorageFolder, true);
-        List<File> fromSftpFiles = localFileManager.getFiles(errorStorageFolder, true);
-        List<String> errorReportsFileNames = errorReportsList.stream().map(File::getName).collect(Collectors.toList());
-        List<String> fromSftpFileNames = fromSftpFiles.stream().map(File::getName).collect(Collectors.toList());
+        sftpFileManager.downloadFilesFromSftp(remoteFolder, temporaryFiles, true);
+        List<File> fromSftpFiles = localFileManager.getFiles(temporaryFiles, true);
+        List<String> errorReportsFileNames = FileUtil.getFilesNames(errorReportsList);
+        List<String> fromSftpFileNames = FileUtil.getFilesNames(fromSftpFiles);
         Assert.assertFalse(fromSftpFiles.isEmpty(), "List of files received from sftp is empty");
         Assert.assertEquals(errorReportsFileNames, fromSftpFileNames,
                 "Names from files received from sftp and shipped to sorter are not equals");

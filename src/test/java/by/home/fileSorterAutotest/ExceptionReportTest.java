@@ -2,10 +2,7 @@ package by.home.fileSorterAutotest;
 
 import by.home.fileSorterAutotest.service.LocalFileManager;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.io.File;
 import java.util.List;
@@ -18,23 +15,32 @@ public class ExceptionReportTest {
 
     private LocalFileManager localFileManager;
     private String sorterInputFolder;
-    private String exceptionFolder;
+    private String exceptionProcessedFolder;
     private int maxWaitingTime;
 
-    @Parameters({"sorterInputFolder", "exceptionFolder", "maxWaitingTime"})
+    @Parameters({"sorterInputFolder", "exceptionProcessedFolder", "maxWaitingTime"})
     @BeforeClass
     public void setUp(String sorterInputFolder, String exceptionFolder, String maxWaitingTime) {
         this.localFileManager = new LocalFileManager();
         this.sorterInputFolder = sorterInputFolder;
-        this.exceptionFolder = exceptionFolder;
+        this.exceptionProcessedFolder = exceptionFolder;
         this.maxWaitingTime = Integer.parseInt(maxWaitingTime);
+        localFileManager.cleanDirectory(sorterInputFolder, false);
+    }
+
+    @Parameters({"exceptionProcessedFolder"})
+    @BeforeMethod
+    @AfterMethod
+    public void clean(String temporaryFiles) {
+        localFileManager.cleanDirectory(exceptionProcessedFolder + "valid/", false);
+        localFileManager.cleanDirectory(exceptionProcessedFolder + "notValid/", false);
     }
 
     @DataProvider
     public Object[][] exceptionReportTest() {
         return new Object[][]{
-                {"/testReports/exception/valid/", exceptionFolder + "valid/"},
-                {"/testReports/exception/notValid/", exceptionFolder + "notValid/"},
+                {"/testReports/exception/valid/", exceptionProcessedFolder + "valid/"},
+                {"/testReports/exception/notValid/", exceptionProcessedFolder + "notValid/"},
         };
     }
 

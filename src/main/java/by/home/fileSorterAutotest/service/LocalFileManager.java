@@ -1,5 +1,6 @@
 package by.home.fileSorterAutotest.service;
 
+import by.home.fileSorterAutotest.service.utils.ResourcesUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -14,8 +15,6 @@ import java.util.List;
  */
 @Slf4j
 public class LocalFileManager {
-
-    private ResourcesUtil resourcesUtil = new ResourcesUtil();
 
     /**
      * Copy files in list to target path
@@ -32,7 +31,7 @@ public class LocalFileManager {
             } catch (IOException e) {
                 log.error("Get exception with moving files from \n{}, to \n{}, exception \n{}", file.getPath(),
                         targetFolderPath, e
-                        .getMessage());
+                                .getMessage());
             }
         });
     }
@@ -46,7 +45,7 @@ public class LocalFileManager {
      */
     public List<File> getFiles(String targetFolderPath, boolean isResources) {
         try {
-            String folderPath = isResources ? resourcesUtil.getResourcesPath(targetFolderPath) :
+            String folderPath = isResources ? ResourcesUtil.getResourcesPath(targetFolderPath) :
                     targetFolderPath;
             log.info("Try to get files from path \n{}", targetFolderPath);
             File targetFolder = new File(folderPath);
@@ -67,12 +66,11 @@ public class LocalFileManager {
      */
     public boolean waitFilesTransfer(String folderPath, int maxWaitingTime, boolean folderMustBeEmpty) {
         try {
-            log.info("Wait when folder {} will isEmpty - {}", folderPath, folderMustBeEmpty);
-            File targetFolder = new File(folderPath);
+            log.info("Wait files transfer in folder {}", folderPath);
             double maxMethodTime = System.nanoTime() + maxWaitingTime * Math.pow(10, 9);
             boolean folderIsEmpty;
             do {
-                File[] listFiles = targetFolder.listFiles();
+                File[] listFiles = new File(folderPath).listFiles();
                 Thread.sleep(500);
                 folderIsEmpty = (listFiles != null ? listFiles.length : 0) == 0;
             } while (!(folderIsEmpty == folderMustBeEmpty) && System.nanoTime() < maxMethodTime);
@@ -87,15 +85,19 @@ public class LocalFileManager {
      * Method clean target directory
      *
      * @param directoryPath path of cleaning directory
+     * @param isResources   show than directory is in resources
+     * @return is the directory clean
      */
-    public void cleanDirectory(String directoryPath, boolean isResources) {
+    public boolean cleanDirectory(String directoryPath, boolean isResources) {
         log.info("Clean directory {}", directoryPath);
-        String folderPath = (isResources) ? new File(this.getClass().getResource(directoryPath).getFile()).getPath() :
+        String folderPath = (isResources) ? ResourcesUtil.getResourcesPath(directoryPath) :
                 directoryPath;
         try {
             FileUtils.cleanDirectory(new File(folderPath));
+            return true;
         } catch (IOException e) {
             log.error("Cant clean directory {}, get exception \n {}", directoryPath, e.getMessage());
+            return false;
         }
     }
 }

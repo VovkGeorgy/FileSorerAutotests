@@ -1,11 +1,11 @@
-package by.home.fileSorterAutotest.service;
+package by.home.fileSorterAutotest.service.utils;
 
 import java.io.File;
 
 /**
  * Class consist methods to working with resources
  */
-class ResourcesUtil {
+public class ResourcesUtil {
 
     /**
      * Get full path to resources from relative path
@@ -13,7 +13,7 @@ class ResourcesUtil {
      * @param relativePath relative path to resources
      * @return full path to resources
      */
-    String getResourcesPath(String relativePath) {
-        return new File(this.getClass().getResource(relativePath).getFile()).getPath() + "\\";
+    public static String getResourcesPath(String relativePath) {
+        return new File(ResourcesUtil.class.getResource(relativePath).getFile()).getPath() + "\\";
     }
 }

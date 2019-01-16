@@ -6,7 +6,7 @@
     <parameter name="maxWaitingTime" value="5"/>
 
     <test name="errorReportTest">
-        <parameter name="errorStorageFolder" value="/testReports/error/fromSftpStorage/"/>
+        <parameter name="temporaryFiles" value="/testReports/error/temporaryFiles/"/>
         <parameter name="ftpUsername" value="admin"/>
         <parameter name="ftpPassword" value="11111"/>
         <parameter name="ftpHost" value="0.0.0.0"/>
@@ -20,7 +20,7 @@
     </test>
 
     <test name="exceptionReportTest">
-        <parameter name="exceptionFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/exceptionFolder/"/>
+        <parameter name="exceptionProcessedFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/exceptionFolder/"/>
         <classes>
             <class name="by.home.fileSorterAutotest.ExceptionReportTest"/>
         </classes>

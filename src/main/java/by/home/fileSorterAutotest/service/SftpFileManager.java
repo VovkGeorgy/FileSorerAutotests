@@ -1,5 +1,6 @@
 package by.home.fileSorterAutotest.service;
 
+import by.home.fileSorterAutotest.service.utils.ResourcesUtil;
 import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,7 +16,6 @@ public class SftpFileManager {
     private Session session = null;
     private ChannelSftp sftpChannel = new ChannelSftp();
     private Map<String, String> sftpConfigMap = new HashMap<>();
-    private ResourcesUtil resourcesUtil = new ResourcesUtil();
 
     public SftpFileManager(String ftpUsername, String ftpPassword, String ftpHost, String ftpPort,
                            String ftpHostKeyChecking, String ftpHostKeyCheckingValue, String ftpChanelType) {
@@ -37,7 +37,7 @@ public class SftpFileManager {
      */
     public void downloadFilesFromSftp(String fromFolderPath, String toFolderPath, boolean downloadToResources) {
         try {
-            toFolderPath = downloadToResources ? resourcesUtil.getResourcesPath(toFolderPath) :
+            toFolderPath = downloadToResources ? ResourcesUtil.getResourcesPath(toFolderPath) :
                     toFolderPath;
             ChannelSftp sftpChannel = configSftpChannel(sftpConfigMap);
             log.debug("Download files from folder {}, to folder {}", fromFolderPath, toFolderPath);
@@ -71,5 +71,26 @@ public class SftpFileManager {
         sftpChannel.exit();
         if (session != null) session.disconnect();
         else log.debug("Cant close session, is already NULL");
+    }
+
+    /**
+     * Method clean target directory on sftp
+     *
+     * @param directoryPath path of cleaning directory
+     * @return is the directory clean
+     */
+    public boolean cleanDirectory(String directoryPath) {
+        try {
+            ChannelSftp sftpChannel = configSftpChannel(sftpConfigMap);
+            log.debug("Delete all files from folder {}", directoryPath);
+            sftpChannel.rm(directoryPath + "*");
+            return true;
+        } catch (JSchException | SftpException | NullPointerException e) {
+            log.error("SFTP Connection process exception {}", e.getMessage());
+            return false;
+        } finally {
+            log.info("Close server connection");
+            connectionTeardown();
+        }
     }
 }
