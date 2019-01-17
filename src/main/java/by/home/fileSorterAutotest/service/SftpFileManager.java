@@ -77,7 +77,7 @@ public class SftpFileManager {
      * Method clean target directory on sftp
      *
      * @param directoryPath path of cleaning directory
-     * @return is the directory clean
+     * @return result of directory cleaning
      */
     public boolean cleanDirectory(String directoryPath) {
         try {

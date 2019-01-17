@@ -62,7 +62,7 @@ public class LocalFileManager {
      * @param folderPath        target folder
      * @param maxWaitingTime    max times for scanning folder
      * @param folderMustBeEmpty folder must be empty or not
-     * @return is the target folder empty
+     * @return result of waiting folder condition, depends on @param folderMustBeEmpty
      */
     public boolean waitFilesTransfer(String folderPath, int maxWaitingTime, boolean folderMustBeEmpty) {
         try {
@@ -86,7 +86,7 @@ public class LocalFileManager {
      *
      * @param directoryPath path of cleaning directory
      * @param isResources   show than directory is in resources
-     * @return is the directory clean
+     * @return result of directory cleaning
      */
     public boolean cleanDirectory(String directoryPath, boolean isResources) {
         log.info("Clean directory {}", directoryPath);
