@@ -1,8 +1,9 @@
 package by.home.fileSorterAutotest.service;
 
-import by.home.fileSorterAutotest.service.utils.ResourcesUtil;
+import by.home.fileSorterAutotest.utils.FileUtil;
 import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,10 +13,14 @@ import java.util.Vector;
  * Class have method those get files from sftp
  */
 @Slf4j
+@Service
 public class SftpFileManager {
     private Session session = null;
     private ChannelSftp sftpChannel = new ChannelSftp();
     private Map<String, String> sftpConfigMap = new HashMap<>();
+
+    public SftpFileManager() {
+    }
 
     public SftpFileManager(String ftpUsername, String ftpPassword, String ftpHost, String ftpPort,
                            String ftpHostKeyChecking, String ftpHostKeyCheckingValue, String ftpChanelType) {
@@ -37,7 +42,7 @@ public class SftpFileManager {
      */
     public void downloadFilesFromSftp(String fromFolderPath, String toFolderPath, boolean downloadToResources) {
         try {
-            toFolderPath = downloadToResources ? ResourcesUtil.getResourcesPath(toFolderPath) :
+            toFolderPath = downloadToResources ? FileUtil.getResourcesPath(toFolderPath) :
                     toFolderPath;
             ChannelSftp sftpChannel = configSftpChannel(sftpConfigMap);
             log.debug("Download files from folder {}, to folder {}", fromFolderPath, toFolderPath);
@@ -70,24 +75,23 @@ public class SftpFileManager {
     private void connectionTeardown() {
         sftpChannel.exit();
         if (session != null) session.disconnect();
-        else log.debug("Cant close session, is already NULL");
+        else log.error("Cant close session, is already NULL");
     }
 
     /**
-     * Method clean target directory on sftp
+     * Method clean target directories on sftp
      *
-     * @param directoryPath path of cleaning directory
-     * @return result of directory cleaning
+     * @param directoryPaths paths of cleaning directories
      */
-    public boolean cleanDirectory(String directoryPath) {
+    public void cleanDirectories(String... directoryPaths) {
         try {
             ChannelSftp sftpChannel = configSftpChannel(sftpConfigMap);
-            log.debug("Delete all files from folder {}", directoryPath);
-            sftpChannel.rm(directoryPath + "*");
-            return true;
+            for (String directoryPath : directoryPaths) {
+                log.info("Delete all files from folder {}", directoryPath);
+                sftpChannel.rm(directoryPath + "*");
+            }
         } catch (JSchException | SftpException | NullPointerException e) {
             log.error("SFTP Connection process exception {}", e.getMessage());
-            return false;
         } finally {
             log.info("Close server connection");
             connectionTeardown();

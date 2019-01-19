@@ -1,9 +1,10 @@
 package by.home.fileSorterAutotest.service;
 
-import by.home.fileSorterAutotest.service.utils.ResourcesUtil;
+import by.home.fileSorterAutotest.utils.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.util.List;
  * Class hold methods with primitive operations on local files
  */
 @Slf4j
+@Service
 public class LocalFileManager {
 
     /**
@@ -30,8 +32,7 @@ public class LocalFileManager {
                 FileUtils.copyFileToDirectory(file, new File(targetFolderPath), false);
             } catch (IOException e) {
                 log.error("Get exception with moving files from \n{}, to \n{}, exception \n{}", file.getPath(),
-                        targetFolderPath, e
-                                .getMessage());
+                        targetFolderPath, e.getMessage());
             }
         });
     }
@@ -45,11 +46,10 @@ public class LocalFileManager {
      */
     public List<File> getFiles(String targetFolderPath, boolean isResources) {
         try {
-            String folderPath = isResources ? ResourcesUtil.getResourcesPath(targetFolderPath) :
+            String folderPath = isResources ? FileUtil.getResourcesPath(targetFolderPath) :
                     targetFolderPath;
             log.info("Try to get files from path \n{}", targetFolderPath);
-            File targetFolder = new File(folderPath);
-            return (List<File>) FileUtils.listFiles(targetFolder, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+            return (List<File>) FileUtils.listFiles(new File(folderPath), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
         } catch (NullPointerException nul) {
             log.error("Cant get files from path \n{}, get exception \n {}", targetFolderPath, nul.getMessage());
             return new ArrayList<>();
@@ -82,22 +82,21 @@ public class LocalFileManager {
     }
 
     /**
-     * Method clean target directory
+     * Method clean target directories
      *
-     * @param directoryPath path of cleaning directory
-     * @param isResources   show than directory is in resources
-     * @return result of directory cleaning
+     * @param directoryPaths paths of cleaning directories
+     * @param isResources    show than directory is in resources
      */
-    public boolean cleanDirectory(String directoryPath, boolean isResources) {
-        log.info("Clean directory {}", directoryPath);
-        String folderPath = (isResources) ? ResourcesUtil.getResourcesPath(directoryPath) :
-                directoryPath;
-        try {
-            FileUtils.cleanDirectory(new File(folderPath));
-            return true;
-        } catch (IOException e) {
-            log.error("Cant clean directory {}, get exception \n {}", directoryPath, e.getMessage());
-            return false;
+    public void cleanDirectories(boolean isResources, String... directoryPaths) {
+        for (String directoryPath : directoryPaths) {
+            try {
+                log.info("Clean directory {}", directoryPath);
+                String folderPath = (isResources) ? FileUtil.getResourcesPath(directoryPath) :
+                        directoryPath;
+                FileUtils.cleanDirectory(new File(folderPath));
+            } catch (IOException e) {
+                log.error("Cant clean directory {}, get exception \n {}", directoryPath, e.getMessage());
+            }
         }
     }
 }

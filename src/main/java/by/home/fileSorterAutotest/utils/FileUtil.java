@@ -1,4 +1,4 @@
-package by.home.fileSorterAutotest.service.utils;
+package by.home.fileSorterAutotest.utils;
 
 import java.io.File;
 import java.util.List;
@@ -17,5 +17,15 @@ public class FileUtil {
      */
     public static List<String> getFilesNames(List<File> filesList) {
         return filesList.stream().map(File::getName).collect(Collectors.toList());
+    }
+
+    /**
+     * Get full path to resources from relative path
+     *
+     * @param relativePath relative path to resources
+     * @return full path to resources
+     */
+    public static String getResourcesPath(String relativePath) {
+        return new File(FileUtil.class.getResource(relativePath).getFile()).getPath() + "\\";
     }
 }
