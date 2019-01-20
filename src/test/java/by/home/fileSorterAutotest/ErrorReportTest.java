@@ -1,11 +1,9 @@
 package by.home.fileSorterAutotest;
 
 import by.home.fileSorterAutotest.config.AppConfig;
-import by.home.fileSorterAutotest.entity.ErrorMessage;
 import by.home.fileSorterAutotest.repository.ErrorRepository;
 import by.home.fileSorterAutotest.service.LocalFileManager;
 import by.home.fileSorterAutotest.service.SftpFileManager;
-import by.home.fileSorterAutotest.service.report.impl.JsonParser;
 import by.home.fileSorterAutotest.utils.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -16,7 +14,6 @@ import org.testng.annotations.*;
 
 import java.io.File;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Class test report sorter
@@ -30,9 +27,6 @@ public class ErrorReportTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private ErrorRepository errorRepository;
-
-    @Autowired
-    private JsonParser jsonParser;
 
     private SftpFileManager sftpFileManager;
     private String sorterInputFolder;
@@ -70,13 +64,6 @@ public class ErrorReportTest extends AbstractTestNGSpringContextTests {
         };
     }
 
-    @DataProvider
-    public Object[][] errorReportDatabaseTest() {
-        return new Object[][]{
-                {"/testReports/error/valid/"}
-        };
-    }
-
     /**
      * Test sorter with error reports, and check it on sftp server
      *
@@ -96,23 +83,5 @@ public class ErrorReportTest extends AbstractTestNGSpringContextTests {
         Assert.assertFalse(fromSftpFiles.isEmpty(), "List of files received from sftp is empty");
         Assert.assertEquals(errorReportsFileNames, fromSftpFileNames,
                 "Names from files received from sftp and shipped to sorter are not equals");
-    }
-
-    /**
-     * Test sorter saving valid error report message entities in database
-     *
-     * @param fromFolder folder with valid reports
-     */
-    @Test(dataProvider = "errorReportDatabaseTest")
-    public void errorReportsSorterInBaseTest(String fromFolder) {
-        List<File> errorReportsList = localFileManager.getFiles(fromFolder, true);
-        localFileManager.copy(errorReportsList, sorterInputFolder);
-        List<ErrorMessage> errorMessageList = errorReportsList.stream().map(file -> jsonParser.parseFile(file)).collect(Collectors
-                .toList());
-        Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, true),
-                "Files are not moved from sorter input folder " + sorterInputFolder);
-        List<ErrorMessage> fromDatabaseList = errorMessageList.stream().map(message -> errorRepository.findById(message.getId()
-        )).map(message -> message.orElseGet(null)).collect(Collectors.toList());
-        Assert.assertTrue(errorMessageList.equals(fromDatabaseList), "Lists of messages entity are not equals");
     }
 }

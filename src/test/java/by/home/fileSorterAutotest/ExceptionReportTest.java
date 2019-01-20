@@ -1,10 +1,8 @@
 package by.home.fileSorterAutotest;
 
 import by.home.fileSorterAutotest.config.AppConfig;
-import by.home.fileSorterAutotest.entity.ExceptionMessage;
 import by.home.fileSorterAutotest.repository.ExceptionRepository;
 import by.home.fileSorterAutotest.service.LocalFileManager;
-import by.home.fileSorterAutotest.service.report.impl.CsvParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -29,11 +27,9 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private ExceptionRepository exceptionRepository;
 
-    @Autowired
-    private CsvParser csvParser;
-
     private String sorterInputFolder;
-    private String exceptionProcessedFolder;
+    private String validExceptionProcessedFolder;
+    private String notValidExceptionProcessedFolder;
     private int maxWaitingTime;
 
 
@@ -41,7 +37,8 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
     @BeforeClass
     public void setUp(String sorterInputFolder, String exceptionFolder, String maxWaitingTime) {
         this.sorterInputFolder = sorterInputFolder;
-        this.exceptionProcessedFolder = exceptionFolder;
+        this.validExceptionProcessedFolder = exceptionFolder + "valid/";
+        this.notValidExceptionProcessedFolder = exceptionFolder + "notValid/";
         this.maxWaitingTime = Integer.parseInt(maxWaitingTime);
         localFileManager.cleanDirectories(false, sorterInputFolder);
     }
@@ -51,22 +48,14 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
     @AfterMethod
     public void clean(String temporaryFiles) {
         exceptionRepository.deleteAll();
-        localFileManager.cleanDirectories(false,
-                exceptionProcessedFolder + "valid/", exceptionProcessedFolder + "notValid/");
+        localFileManager.cleanDirectories(false, validExceptionProcessedFolder, notValidExceptionProcessedFolder);
     }
 
     @DataProvider
     public Object[][] exceptionReportTest() {
         return new Object[][]{
-                {"/testReports/exception/valid/", exceptionProcessedFolder + "valid/"},
-                {"/testReports/exception/notValid/", exceptionProcessedFolder + "notValid/"}
-        };
-    }
-
-    @DataProvider
-    public Object[][] exceptionReportDatabaseTest() {
-        return new Object[][]{
-                {"/testReports/exception/valid/"}
+                {"/testReports/exception/valid/", validExceptionProcessedFolder},
+                {"/testReports/exception/notValid/", notValidExceptionProcessedFolder}
         };
     }
 
@@ -88,24 +77,5 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
         Assert.assertFalse(processedFiles.isEmpty(), "Not found needed files in output sorter folder " + sorterFolder);
         Assert.assertEquals(exceptionReportFileNames, processedFilesNames,
                 "Names of files received from output sorter folder and input files are not equals");
-    }
-
-    /**
-     * Test sorter saving valid exception report message entities in database
-     *
-     * @param fromFolder folder with valid reports
-     */
-    @Test(dataProvider = "exceptionReportDatabaseTest")
-    public void exceptionReportsSorterInBaseTest(String fromFolder) {
-        List<File> errorReportsList = localFileManager.getFiles(fromFolder, true);
-        localFileManager.copy(errorReportsList, sorterInputFolder);
-        List<ExceptionMessage> errorMessageList = errorReportsList.stream().map(file -> csvParser.parseFile(file)).collect
-                (Collectors.toList());
-        Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, true),
-                "Files are not moved from sorter input folder " + sorterInputFolder);
-        List<ExceptionMessage> fromDatabaseList = errorMessageList.stream().map(message -> exceptionRepository.findById(message
-                .getId()
-        )).map(message -> message.orElseGet(null)).collect(Collectors.toList());
-        Assert.assertTrue(errorMessageList.equals(fromDatabaseList), "Lists of messages entity are not equals");
     }
 }
