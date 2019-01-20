@@ -1,4 +1,4 @@
-group 'FileSorterAutoest'
+group 'FileSorterAutotest'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
