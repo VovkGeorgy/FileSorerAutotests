@@ -1,21 +1,26 @@
 package by.home.fileSorterAutotest.service;
 
+import by.home.fileSorterAutotest.utils.FileUtil;
 import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * Class have method those get files from sftp
  */
 @Slf4j
+@Service
 public class SftpFileManager {
     private Session session = null;
     private ChannelSftp sftpChannel = new ChannelSftp();
     private Map<String, String> sftpConfigMap = new HashMap<>();
+
+    public SftpFileManager() {
+    }
 
     public SftpFileManager(String ftpUsername, String ftpPassword, String ftpHost, String ftpPort,
                            String ftpHostKeyChecking, String ftpHostKeyCheckingValue, String ftpChanelType) {
@@ -29,41 +34,67 @@ public class SftpFileManager {
     }
 
     /**
-     * Move files from sftp server
+     * Download files from sftp server
      *
-     * @param fileList   files which need get from sftp
-     * @param fromFolder folder were need find files
-     * @param toFolder   folder where need put files
+     * @param fromFolderPath      folder path where need find files
+     * @param toFolderPath        folder path where need download files
+     * @param downloadToResources show that files must downloaded to resources
      */
-    public void downloadFilesFromSftp(List<File> fileList, String fromFolder, String toFolder) {
+    public void downloadFilesFromSftp(String fromFolderPath, String toFolderPath, boolean downloadToResources) {
         try {
+            toFolderPath = downloadToResources ? FileUtil.getResourcesPath(toFolderPath) :
+                    toFolderPath;
             ChannelSftp sftpChannel = configSftpChannel(sftpConfigMap);
-            log.info("Upload files to server");
-            File folder = new File(this.getClass().getResource(toFolder).getFile());
-            for (File file : fileList) {
-                sftpChannel.get(fromFolder + file.getName(), folder.getPath() + "/" + file.getName());
+            log.debug("Download files from folder {}, to folder {}", fromFolderPath, toFolderPath);
+            sftpChannel.cd(fromFolderPath);
+            Vector<ChannelSftp.LsEntry> list = sftpChannel.ls("*");
+            for (ChannelSftp.LsEntry listEntry : list) {
+                sftpChannel.get(listEntry.getFilename(), toFolderPath);
             }
-        } catch (JSchException | SftpException e) {
-            log.error("SFTP Connection exception {}", e.getMessage());
+        } catch (JSchException | SftpException | NullPointerException e) {
+            log.error("SFTP Connection process exception {}", e.getMessage());
         } finally {
-            sftpChannel.exit();
             log.info("Close server connection");
-            if (session != null) session.disconnect();
-            else log.debug("Connection session is NULL");
+            connectionTeardown();
         }
     }
 
     private ChannelSftp configSftpChannel(Map<String, String> sftpConfigMap) throws JSchException {
-        session = new JSch().getSession(sftpConfigMap.get("ftpUsername"), sftpConfigMap.get("ftpHost"), Integer.parseInt(sftpConfigMap.get("ftpPort")));
+        session = new JSch().getSession(sftpConfigMap.get("ftpUsername"), sftpConfigMap.get("ftpHost"), Integer.parseInt
+                (sftpConfigMap.get("ftpPort")));
         session.setConfig(sftpConfigMap.get("ftpHostKeyChecking"), sftpConfigMap.get("ftpHostKeyCheckingValue"));
         session.setPassword(sftpConfigMap.get("ftpPassword"));
-        log.debug("Try to connect to session {}", session);
         session.connect();
         Channel channel = session.openChannel(sftpConfigMap.get("ftpChanelType"));
-        log.debug("Try to connect to chanel {}", channel);
         channel.connect();
         sftpChannel = (ChannelSftp) channel;
-        log.debug("Connecting to server is established");
+        log.info("Connecting to {} : {} server is established", sftpConfigMap.get("ftpHost"), sftpConfigMap.get("ftpPort"));
         return sftpChannel;
+    }
+
+    private void connectionTeardown() {
+        sftpChannel.exit();
+        if (session != null) session.disconnect();
+        else log.error("Cant close session, is already NULL");
+    }
+
+    /**
+     * Method clean target directories on sftp
+     *
+     * @param directoryPaths paths of cleaning directories
+     */
+    public void cleanDirectories(String... directoryPaths) {
+        try {
+            ChannelSftp sftpChannel = configSftpChannel(sftpConfigMap);
+            for (String directoryPath : directoryPaths) {
+                log.info("Delete all files from folder {}", directoryPath);
+                sftpChannel.rm(directoryPath + "*");
+            }
+        } catch (JSchException | SftpException | NullPointerException e) {
+            log.error("SFTP Connection process exception {}", e.getMessage());
+        } finally {
+            log.info("Close server connection");
+            connectionTeardown();
+        }
     }
 }

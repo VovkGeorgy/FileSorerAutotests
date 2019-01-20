@@ -1,7 +1,7 @@
 {
   "messageType": "Error",
-  "id": 4213,
-  "message": "Some message from error",
+  "id": 4211,
+  "message": "Some message from MSG error",
   "typeOfError": "IOError",
   "throwingTime": "2009-12-31 23:59:59"
 }

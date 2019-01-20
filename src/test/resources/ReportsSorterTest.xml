@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="suite">
+<suite name="SorterTestSuite">
 
     <parameter name="sorterInputFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/notSorted/"/>
+    <parameter name="maxWaitingTime" value="5"/>
 
-    <test name="jsonFilesTest">
-        <parameter name="errorStorageFolder" value="/testFiles/json/fromSftpStorage/"/>
+    <test name="errorReportTest">
+        <parameter name="temporaryFiles" value="/testReports/error/temporaryFiles/"/>
         <parameter name="ftpUsername" value="admin"/>
         <parameter name="ftpPassword" value="11111"/>
         <parameter name="ftpHost" value="0.0.0.0"/>
@@ -14,14 +15,14 @@
         <parameter name="ftpHostKeyCheckingValue" value="no"/>
         <parameter name="ftpChanelType" value="sftp"/>
         <classes>
-            <class name="by.home.fileSorterAutotest.JsonFilesTest"/>
+            <class name="by.home.fileSorterAutotest.ErrorReportTest"/>
         </classes>
     </test>
 
-    <test name="txtFilesTest">
-        <parameter name="exceptionFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/exceptionFolder/"/>
+    <test name="exceptionReportTest">
+        <parameter name="exceptionProcessedFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/exceptionFolder/"/>
         <classes>
-            <class name="by.home.fileSorterAutotest.TxtFilesTest"/>
+            <class name="by.home.fileSorterAutotest.ExceptionReportTest"/>
         </classes>
     </test>
 
