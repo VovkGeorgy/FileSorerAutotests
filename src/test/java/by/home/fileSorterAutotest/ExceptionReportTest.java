@@ -32,7 +32,6 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
     private String notValidExceptionProcessedFolder;
     private int maxWaitingTime;
 
-
     @Parameters({"sorterInputFolder", "exceptionProcessedFolder", "maxWaitingTime"})
     @BeforeClass
     public void setUp(String sorterInputFolder, String exceptionFolder, String maxWaitingTime) {
@@ -40,7 +39,6 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
         this.validExceptionProcessedFolder = exceptionFolder + "valid/";
         this.notValidExceptionProcessedFolder = exceptionFolder + "notValid/";
         this.maxWaitingTime = Integer.parseInt(maxWaitingTime);
-        localFileManager.cleanDirectories(false, sorterInputFolder);
     }
 
     @Parameters({"exceptionProcessedFolder"})
@@ -48,7 +46,8 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
     @AfterMethod
     public void clean(String temporaryFiles) {
         exceptionRepository.deleteAll();
-        localFileManager.cleanDirectories(false, validExceptionProcessedFolder, notValidExceptionProcessedFolder);
+        localFileManager.cleanDirectories(false, validExceptionProcessedFolder, notValidExceptionProcessedFolder,
+                sorterInputFolder);
     }
 
     @DataProvider
@@ -68,7 +67,7 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
     @Test(dataProvider = "exceptionReportTest")
     public void exceptionReportsSorterOnLocalTest(String targetFolder, String sorterFolder) {
         List<File> exceptionReportList = localFileManager.getFiles(targetFolder, true);
-        localFileManager.copy(exceptionReportList, sorterInputFolder);
+        localFileManager.copyFiles(exceptionReportList, sorterInputFolder);
         Assert.assertFalse(localFileManager.waitFilesTransfer(sorterFolder, maxWaitingTime, false),
                 "Files not found to output sorter folder");
         List<File> processedFiles = localFileManager.getFiles(sorterFolder, false);

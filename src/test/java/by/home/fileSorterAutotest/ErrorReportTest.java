@@ -28,23 +28,19 @@ public class ErrorReportTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private ErrorRepository errorRepository;
 
+    @Autowired
     private SftpFileManager sftpFileManager;
+
     private String sorterInputFolder;
     private String temporaryFiles;
     private int maxWaitingTime;
 
-    @Parameters({"sorterInputFolder", "temporaryFiles", "ftpUsername", "ftpPassword", "ftpHost",
-            "ftpPort", "ftpHostKeyChecking", "ftpHostKeyCheckingValue", "ftpChanelType", "maxWaitingTime"})
+    @Parameters({"sorterInputFolder", "temporaryFiles", "maxWaitingTime"})
     @BeforeClass
-    public void setUp(String sorterInputFolder, String temporaryFiles, String ftpUsername, String ftpPassword, String ftpHost,
-                      String ftpPort, String ftpHostKeyChecking, String ftpHostKeyCheckingValue, String ftpChanelType, int
-                              maxWaitingTime) {
-        this.sftpFileManager = new SftpFileManager(ftpUsername, ftpPassword, ftpHost, ftpPort,
-                ftpHostKeyChecking, ftpHostKeyCheckingValue, ftpChanelType);
+    public void setUp(String sorterInputFolder, String temporaryFiles, int maxWaitingTime) {
         this.sorterInputFolder = sorterInputFolder;
         this.temporaryFiles = temporaryFiles;
         this.maxWaitingTime = maxWaitingTime;
-        localFileManager.cleanDirectories(false, sorterInputFolder);
     }
 
     @Parameters({"temporaryFiles"})
@@ -52,6 +48,7 @@ public class ErrorReportTest extends AbstractTestNGSpringContextTests {
     @AfterMethod
     public void clean(String temporaryFiles) {
         errorRepository.deleteAll();
+        localFileManager.cleanDirectories(false, sorterInputFolder);
         localFileManager.cleanDirectories(true, temporaryFiles);
         sftpFileManager.cleanDirectories("/errorFiles/valid/", "/errorFiles/notValid/");
     }
@@ -73,10 +70,10 @@ public class ErrorReportTest extends AbstractTestNGSpringContextTests {
     @Test(dataProvider = "errorReportSftpTest")
     public void errorReportsSorterOnSftpTest(String fromFolder, String remoteFolder) {
         List<File> errorReportsList = localFileManager.getFiles(fromFolder, true);
-        localFileManager.copy(errorReportsList, sorterInputFolder);
+        localFileManager.copyFiles(errorReportsList, sorterInputFolder);
         Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, true),
                 "Files are not moved from sorter input folder " + sorterInputFolder);
-        sftpFileManager.downloadFilesFromSftp(remoteFolder, temporaryFiles, true);
+        sftpFileManager.downloadFiles(remoteFolder, temporaryFiles, true);
         List<File> fromSftpFiles = localFileManager.getFiles(temporaryFiles, true);
         List<String> errorReportsFileNames = FileUtil.getFilesNames(errorReportsList);
         List<String> fromSftpFileNames = FileUtil.getFilesNames(fromSftpFiles);

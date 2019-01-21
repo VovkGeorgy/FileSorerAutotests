@@ -2,25 +2,13 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="SorterTestSuite">
 
-    <parameter name="sorterInputFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/notSorted/"/>
-    <parameter name="maxWaitingTime" value="5"/>
-
     <test name="errorReportTest">
-        <parameter name="temporaryFiles" value="/testReports/error/temporaryFiles/"/>
-        <parameter name="ftpUsername" value="admin"/>
-        <parameter name="ftpPassword" value="11111"/>
-        <parameter name="ftpHost" value="0.0.0.0"/>
-        <parameter name="ftpPort" value="22"/>
-        <parameter name="ftpHostKeyChecking" value="StrictHostKeyChecking"/>
-        <parameter name="ftpHostKeyCheckingValue" value="no"/>
-        <parameter name="ftpChanelType" value="sftp"/>
         <classes>
             <class name="by.home.fileSorterAutotest.ErrorReportTest"/>
         </classes>
     </test>
 
     <test name="exceptionReportTest">
-        <parameter name="exceptionProcessedFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/exceptionFolder/"/>
         <classes>
             <class name="by.home.fileSorterAutotest.ExceptionReportTest"/>
         </classes>

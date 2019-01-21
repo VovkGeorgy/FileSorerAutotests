@@ -21,15 +21,4 @@ public class ErrorMessage extends AbstractMessage {
 
     public ErrorMessage() {
     }
-
-    public ErrorMessage(String typeOfError, String messageType, Long id, String message, String throwingTime, String
-            fileName, boolean isValid) {
-        this.typeOfError = typeOfError;
-        this.messageType = messageType;
-        this.id = id;
-        this.message = message;
-        this.throwingTime = throwingTime;
-        this.fileName = fileName;
-        this.isValid = isValid;
-    }
 }

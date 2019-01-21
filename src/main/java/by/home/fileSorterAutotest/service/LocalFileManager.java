@@ -24,7 +24,7 @@ public class LocalFileManager {
      * @param fileList         list of files
      * @param targetFolderPath path to output folder
      */
-    public void copy(List<File> fileList, String targetFolderPath) {
+    public void copyFiles(List<File> fileList, String targetFolderPath) {
         log.debug("Copy {} files to folder {}", fileList.size(), targetFolderPath);
         fileList.forEach(file -> {
             try {

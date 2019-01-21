@@ -4,10 +4,11 @@ import by.home.fileSorterAutotest.config.AppConfig;
 import by.home.fileSorterAutotest.entity.ExceptionMessage;
 import by.home.fileSorterAutotest.repository.ExceptionRepository;
 import by.home.fileSorterAutotest.service.LocalFileManager;
-import by.home.fileSorterAutotest.service.report.impl.CsvParser;
+import by.home.fileSorterAutotest.service.report.IReportParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Test
 @ContextConfiguration(classes = AppConfig.class, loader = AnnotationConfigContextLoader.class)
-public class ExceptionReportDatabaseTest {
+public class ExceptionReportDatabaseTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private LocalFileManager localFileManager;
@@ -26,7 +27,7 @@ public class ExceptionReportDatabaseTest {
     private ExceptionRepository exceptionRepository;
 
     @Autowired
-    private CsvParser csvParser;
+    private IReportParser<ExceptionMessage> csvParser;
 
     private String sorterInputFolder;
     private String validExceptionProcessedFolder;
@@ -41,7 +42,6 @@ public class ExceptionReportDatabaseTest {
         this.validExceptionProcessedFolder = exceptionFolder + "valid/";
         this.notValidExceptionProcessedFolder = exceptionFolder + "notValid/";
         this.maxWaitingTime = Integer.parseInt(maxWaitingTime);
-        localFileManager.cleanDirectories(false, sorterInputFolder);
     }
 
     @Parameters({"exceptionProcessedFolder"})
@@ -49,7 +49,8 @@ public class ExceptionReportDatabaseTest {
     @AfterMethod
     public void clean(String temporaryFiles) {
         exceptionRepository.deleteAll();
-        localFileManager.cleanDirectories(false, validExceptionProcessedFolder, notValidExceptionProcessedFolder);
+        localFileManager.cleanDirectories(false, validExceptionProcessedFolder, notValidExceptionProcessedFolder,
+                sorterInputFolder);
     }
 
     @DataProvider
@@ -67,7 +68,7 @@ public class ExceptionReportDatabaseTest {
     @Test(dataProvider = "exceptionReportDatabaseTest")
     public void exceptionReportsSorterInBaseTest(String fromFolder) {
         List<File> errorReportsList = localFileManager.getFiles(fromFolder, true);
-        localFileManager.copy(errorReportsList, sorterInputFolder);
+        localFileManager.copyFiles(errorReportsList, sorterInputFolder);
         List<ExceptionMessage> errorMessageList = errorReportsList.stream().map(file -> csvParser.parseFile(file)).collect
                 (Collectors.toList());
         Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, true),
