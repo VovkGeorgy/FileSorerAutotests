@@ -22,6 +22,11 @@ public class ExceptionMessage extends AbstractMessage {
     public ExceptionMessage() {
     }
 
+    public ExceptionMessage(String fileName, boolean isValid) {
+        this.fileName = fileName;
+        this.isValid = isValid;
+    }
+
     public ExceptionMessage(String typeOfException, String messageType, Long id, String message, String throwingTime, String
             fileName, boolean isValid) {
         this.typeOfException = typeOfException;

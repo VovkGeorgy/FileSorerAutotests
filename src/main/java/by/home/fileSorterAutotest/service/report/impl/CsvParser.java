@@ -24,7 +24,7 @@ public class CsvParser implements IReportParser<ExceptionMessage> {
      * Method parse input csv file
      *
      * @param file file to parse
-     * @return entity from parsed file, or if can't pase file, return entity only with file name and false validity
+     * @return entity from parsed file, or if can't parse file, return entity only with file name and false validity
      */
     @Override
     public ExceptionMessage parseFile(File file) {
@@ -34,21 +34,23 @@ public class CsvParser implements IReportParser<ExceptionMessage> {
             Iterable<CSVRecord> records =
                     CSVFormat.RFC4180.withHeader("messageType", "id", "message", "typeOfException", "throwingTime").parse(in);
             CSVRecord record = records.iterator().next();
-            return new ExceptionMessage(
-                    record.get("typeOfException"),
-                    record.get("messageType"),
-                    Long.parseLong(record.get("id")),
-                    record.get("message"),
-                    record.get("throwingTime"),
-                    filename,
-                    true
-            );
+            log.info("Csv file {} is parse successfully", filename);
+            return validExceptionMessageBuilder(record, filename);
         } catch (IOException | NullPointerException | IllegalArgumentException e) {
             log.error("Can't parse file {}, get exception \n {}", filename, e.getMessage());
-            ExceptionMessage notValidMessage = new ExceptionMessage();
-            notValidMessage.setFileName(filename);
-            notValidMessage.setValid(false);
-            return notValidMessage;
+            return new ExceptionMessage(filename, false);
         }
+    }
+
+    private ExceptionMessage validExceptionMessageBuilder(CSVRecord record, String filename) {
+        return new ExceptionMessage(
+                record.get("typeOfException"),
+                record.get("messageType"),
+                Long.parseLong(record.get("id")),
+                record.get("message"),
+                record.get("throwingTime"),
+                filename,
+                true
+        );
     }
 }

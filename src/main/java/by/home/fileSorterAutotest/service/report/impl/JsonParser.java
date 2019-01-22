@@ -33,13 +33,18 @@ public class JsonParser implements IReportParser<ErrorMessage> {
             });
             errorMessage.setFileName(filename);
             errorMessage.setValid(true);
+            log.info("Json file {} is parse successfully", filename);
             return errorMessage;
         } catch (IOException e) {
             log.error("Cant parse file {}, IOException \n", filename, e.getMessage());
-            ErrorMessage notValidErrorMessage = new ErrorMessage();
-            notValidErrorMessage.setFileName(filename);
-            notValidErrorMessage.setValid(false);
-            return notValidErrorMessage;
+            return notValidErrorMessageBuilder(filename);
         }
+    }
+
+    private ErrorMessage notValidErrorMessageBuilder(String filename) {
+        ErrorMessage notValidErrorMessage = new ErrorMessage();
+        notValidErrorMessage.setFileName(filename);
+        notValidErrorMessage.setValid(false);
+        return notValidErrorMessage;
     }
 }
