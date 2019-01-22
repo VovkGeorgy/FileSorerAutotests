@@ -18,10 +18,10 @@ import java.io.IOException;
 public class JsonParser implements IReportParser<ErrorMessage> {
 
     /**
-     * Method parse json input file
+     * Method parse input json file
      *
      * @param file input file
-     * @return entity from parsed file
+     * @return entity from parsed file or if cant't parse - return entity only with file name and false validity
      */
     @Override
     public ErrorMessage parseFile(File file) {

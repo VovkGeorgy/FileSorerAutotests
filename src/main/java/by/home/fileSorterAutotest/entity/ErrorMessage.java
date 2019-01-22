@@ -18,7 +18,4 @@ public class ErrorMessage extends AbstractMessage {
 
     @Column(name = "type_of_error")
     private String typeOfError;
-
-    public ErrorMessage() {
-    }
 }

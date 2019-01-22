@@ -42,7 +42,7 @@ public class LocalFileManager {
      *
      * @param targetFolderPath folder target path
      * @param isResources      parameter show than files are resources
-     * @return all files in target folder
+     * @return all files in target folder in list
      */
     public List<File> getFiles(String targetFolderPath, boolean isResources) {
         try {

@@ -3,6 +3,7 @@ package by.home.fileSorterAutotest.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -14,8 +15,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.Properties;
 
+/**
+ * Class to config database jpa services
+ */
 @Configuration
 @EnableTransactionManagement
+@PropertySource("classpath:database.properties")
 @EnableJpaRepositories("by.home.fileSorterAutotest.repository")
 public class DataConfig {
 
