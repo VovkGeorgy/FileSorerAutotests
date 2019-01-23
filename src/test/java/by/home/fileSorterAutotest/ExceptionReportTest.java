@@ -1,6 +1,6 @@
 package by.home.fileSorterAutotest;
 
-import by.home.fileSorterAutotest.config.AppConfig;
+import by.home.fileSorterAutotest.config.DataConfig;
 import by.home.fileSorterAutotest.repository.ExceptionRepository;
 import by.home.fileSorterAutotest.service.LocalFileManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +14,13 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static by.home.fileSorterAutotest.service.LocalFileManager.FOLDER_MUST_NOT_BE_EMPTY;
+
 /**
  * Class with tests for exception files sorter
  */
 @Test
-@ContextConfiguration(classes = AppConfig.class, loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = DataConfig.class, loader = AnnotationConfigContextLoader.class)
 public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
@@ -41,10 +43,9 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
         this.maxWaitingTime = Integer.parseInt(maxWaitingTime);
     }
 
-    @Parameters({"exceptionProcessedFolder"})
     @BeforeMethod
     @AfterMethod
-    public void clean(String temporaryFiles) {
+    public void clean() {
         exceptionRepository.deleteAll();
         localFileManager.cleanDirectories(false, validExceptionProcessedFolder, notValidExceptionProcessedFolder,
                 sorterInputFolder);
@@ -68,7 +69,7 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
     public void exceptionReportsSorterOnLocalTest(String targetFolder, String sorterFolder) {
         List<File> exceptionReportList = localFileManager.getFiles(targetFolder, true);
         localFileManager.copyFiles(exceptionReportList, sorterInputFolder);
-        Assert.assertFalse(localFileManager.waitFilesTransfer(sorterFolder, maxWaitingTime, false),
+        Assert.assertFalse(localFileManager.waitFilesTransfer(sorterFolder, maxWaitingTime, FOLDER_MUST_NOT_BE_EMPTY),
                 "Files not found to output sorter folder");
         List<File> processedFiles = localFileManager.getFiles(sorterFolder, false);
         List<String> exceptionReportFileNames = exceptionReportList.stream().map(File::getName).collect(Collectors.toList());

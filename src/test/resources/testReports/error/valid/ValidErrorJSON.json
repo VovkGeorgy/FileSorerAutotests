@@ -1,8 +1,8 @@
 {
-  "messageType": "Error",
+  "messageType": "ERROR",
   "id": 4213,
   "message": "Some message from JSON error",
-  "typeOfError": "IOError",
+  "typeOfError": "STACKOVERFLOW",
   "throwingTime": "2009-12-31 23:59:59"
 }
 

@@ -18,6 +18,9 @@ import java.util.List;
 @Service
 public class LocalFileManager {
 
+    public static final boolean FOLDER_MUST_BE_EMPTY = true;
+    public static final boolean FOLDER_MUST_NOT_BE_EMPTY = false;
+
     /**
      * Copy files in list to target path
      *

@@ -1,6 +1,6 @@
 package by.home.fileSorterAutotest;
 
-import by.home.fileSorterAutotest.config.AppConfig;
+import by.home.fileSorterAutotest.config.DataConfig;
 import by.home.fileSorterAutotest.entity.ErrorMessage;
 import by.home.fileSorterAutotest.repository.ErrorRepository;
 import by.home.fileSorterAutotest.service.LocalFileManager;
@@ -17,8 +17,10 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static by.home.fileSorterAutotest.service.LocalFileManager.FOLDER_MUST_BE_EMPTY;
+
 @Test
-@ContextConfiguration(classes = AppConfig.class, loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = DataConfig.class, loader = AnnotationConfigContextLoader.class)
 public class ErrorReportDatabaseTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
@@ -36,19 +38,19 @@ public class ErrorReportDatabaseTest extends AbstractTestNGSpringContextTests {
     private String sorterInputFolder;
     private int maxWaitingTime;
 
-    @Parameters({"sorterInputFolder", "temporaryFiles", "maxWaitingTime"})
+    @Parameters({"sorterInputFolder", "temporaryFolder", "maxWaitingTime"})
     @BeforeClass
-    public void setUp(String sorterInputFolder, String temporaryFiles, int maxWaitingTime) {
+    public void setUp(String sorterInputFolder, int maxWaitingTime) {
         this.sorterInputFolder = sorterInputFolder;
         this.maxWaitingTime = maxWaitingTime;
     }
 
-    @Parameters({"temporaryFiles"})
+    @Parameters({"temporaryFolder"})
     @BeforeMethod
     @AfterMethod
-    public void clean(String temporaryFiles) {
+    public void clean(String temporaryFolder) {
         errorRepository.deleteAll();
-        localFileManager.cleanDirectories(true, temporaryFiles);
+        localFileManager.cleanDirectories(true, temporaryFolder);
         localFileManager.cleanDirectories(false, sorterInputFolder);
         sftpFileManager.cleanDirectories("/errorFiles/valid/", "/errorFiles/notValid/");
     }
@@ -71,7 +73,7 @@ public class ErrorReportDatabaseTest extends AbstractTestNGSpringContextTests {
         localFileManager.copyFiles(errorReportsList, sorterInputFolder);
         List<ErrorMessage> errorMessageList = errorReportsList.stream().map(file -> jsonParser.parseFile(file)).collect(Collectors
                 .toList());
-        Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, true),
+        Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, FOLDER_MUST_BE_EMPTY),
                 "Files are not moved from sorter input folder " + sorterInputFolder);
         List<ErrorMessage> fromDatabaseList = (List<ErrorMessage>) errorRepository.findAll();
         Assert.assertEquals(errorMessageList, fromDatabaseList, "Lists of messages entity are not equals");

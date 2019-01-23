@@ -35,14 +35,14 @@ public class CsvParser implements IReportParser<ExceptionMessage> {
                     CSVFormat.RFC4180.withHeader("messageType", "id", "message", "typeOfException", "throwingTime").parse(in);
             CSVRecord record = records.iterator().next();
             log.info("Csv file {} is parse successfully", filename);
-            return validExceptionMessageBuilder(record, filename);
+            return buildValidExceptionMessage(record, filename);
         } catch (IOException | NullPointerException | IllegalArgumentException e) {
             log.error("Can't parse file {}, get exception \n {}", filename, e.getMessage());
             return new ExceptionMessage(filename, false);
         }
     }
 
-    private ExceptionMessage validExceptionMessageBuilder(CSVRecord record, String filename) {
+    private ExceptionMessage buildValidExceptionMessage(CSVRecord record, String filename) {
         return new ExceptionMessage(
                 record.get("typeOfException"),
                 record.get("messageType"),

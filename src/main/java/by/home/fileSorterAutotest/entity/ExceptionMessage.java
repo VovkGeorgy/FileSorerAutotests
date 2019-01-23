@@ -3,9 +3,7 @@ package by.home.fileSorterAutotest.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Exception message entity
@@ -16,8 +14,16 @@ import javax.persistence.Table;
 @Table(name = "exception_message", schema = "public", catalog = "sorterBase")
 public class ExceptionMessage extends AbstractMessage {
 
+    enum ExceptionType {
+        IO,
+        NPE,
+        IOOB,
+        FNF
+    }
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "type_of_exception")
-    private String typeOfException;
+    private ExceptionType typeOfException;
 
     public ExceptionMessage() {
     }
@@ -29,8 +35,8 @@ public class ExceptionMessage extends AbstractMessage {
 
     public ExceptionMessage(String typeOfException, String messageType, Long id, String message, String throwingTime, String
             fileName, boolean isValid) {
-        this.typeOfException = typeOfException;
-        this.messageType = messageType;
+        this.typeOfException = ExceptionType.valueOf(typeOfException);
+        this.messageType = MessageType.valueOf(messageType);
         this.id = id;
         this.message = message;
         this.throwingTime = throwingTime;

@@ -1,6 +1,6 @@
 package by.home.fileSorterAutotest;
 
-import by.home.fileSorterAutotest.config.AppConfig;
+import by.home.fileSorterAutotest.config.DataConfig;
 import by.home.fileSorterAutotest.repository.ErrorRepository;
 import by.home.fileSorterAutotest.service.LocalFileManager;
 import by.home.fileSorterAutotest.service.SftpFileManager;
@@ -15,11 +15,13 @@ import org.testng.annotations.*;
 import java.io.File;
 import java.util.List;
 
+import static by.home.fileSorterAutotest.service.LocalFileManager.FOLDER_MUST_BE_EMPTY;
+
 /**
  * Class test report sorter
  */
 @Test
-@ContextConfiguration(classes = AppConfig.class, loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = DataConfig.class, loader = AnnotationConfigContextLoader.class)
 public class ErrorReportTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
@@ -32,24 +34,24 @@ public class ErrorReportTest extends AbstractTestNGSpringContextTests {
     private SftpFileManager sftpFileManager;
 
     private String sorterInputFolder;
-    private String temporaryFiles;
+    private String temporaryFolder;
     private int maxWaitingTime;
 
-    @Parameters({"sorterInputFolder", "temporaryFiles", "maxWaitingTime"})
+    @Parameters({"sorterInputFolder", "temporaryFolder", "maxWaitingTime"})
     @BeforeClass
-    public void setUp(String sorterInputFolder, String temporaryFiles, int maxWaitingTime) {
+    public void setUp(String sorterInputFolder, String temporaryFolder, int maxWaitingTime) {
         this.sorterInputFolder = sorterInputFolder;
-        this.temporaryFiles = temporaryFiles;
+        this.temporaryFolder = temporaryFolder;
         this.maxWaitingTime = maxWaitingTime;
     }
 
-    @Parameters({"temporaryFiles"})
+    @Parameters({"temporaryFolder"})
     @BeforeMethod
     @AfterMethod
-    public void clean(String temporaryFiles) {
+    public void clean(String temporaryFolder) {
         errorRepository.deleteAll();
         localFileManager.cleanDirectories(false, sorterInputFolder);
-        localFileManager.cleanDirectories(true, temporaryFiles);
+        localFileManager.cleanDirectories(true, temporaryFolder);
         sftpFileManager.cleanDirectories("/errorFiles/valid/", "/errorFiles/notValid/");
     }
 
@@ -71,10 +73,10 @@ public class ErrorReportTest extends AbstractTestNGSpringContextTests {
     public void errorReportsSorterOnSftpTest(String fromFolder, String remoteFolder) {
         List<File> errorReportsList = localFileManager.getFiles(fromFolder, true);
         localFileManager.copyFiles(errorReportsList, sorterInputFolder);
-        Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, true),
+        Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, FOLDER_MUST_BE_EMPTY),
                 "Files are not moved from sorter input folder " + sorterInputFolder);
-        sftpFileManager.downloadFiles(remoteFolder, temporaryFiles, true);
-        List<File> fromSftpFiles = localFileManager.getFiles(temporaryFiles, true);
+        sftpFileManager.downloadFiles(remoteFolder, temporaryFolder, true);
+        List<File> fromSftpFiles = localFileManager.getFiles(temporaryFolder, true);
         List<String> errorReportsFileNames = FileUtil.getFilesNames(errorReportsList);
         List<String> fromSftpFileNames = FileUtil.getFilesNames(fromSftpFiles);
         Assert.assertFalse(fromSftpFiles.isEmpty(), "List of files received from sftp is empty");

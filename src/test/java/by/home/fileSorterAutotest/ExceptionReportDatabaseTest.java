@@ -1,6 +1,6 @@
 package by.home.fileSorterAutotest;
 
-import by.home.fileSorterAutotest.config.AppConfig;
+import by.home.fileSorterAutotest.config.DataConfig;
 import by.home.fileSorterAutotest.entity.ExceptionMessage;
 import by.home.fileSorterAutotest.repository.ExceptionRepository;
 import by.home.fileSorterAutotest.service.LocalFileManager;
@@ -16,8 +16,10 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static by.home.fileSorterAutotest.service.LocalFileManager.FOLDER_MUST_BE_EMPTY;
+
 @Test
-@ContextConfiguration(classes = AppConfig.class, loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = DataConfig.class, loader = AnnotationConfigContextLoader.class)
 public class ExceptionReportDatabaseTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
@@ -44,10 +46,9 @@ public class ExceptionReportDatabaseTest extends AbstractTestNGSpringContextTest
         this.maxWaitingTime = Integer.parseInt(maxWaitingTime);
     }
 
-    @Parameters({"exceptionProcessedFolder"})
     @BeforeMethod
     @AfterMethod
-    public void clean(String temporaryFiles) {
+    public void clean() {
         exceptionRepository.deleteAll();
         localFileManager.cleanDirectories(false, validExceptionProcessedFolder, notValidExceptionProcessedFolder,
                 sorterInputFolder);
@@ -71,7 +72,7 @@ public class ExceptionReportDatabaseTest extends AbstractTestNGSpringContextTest
         localFileManager.copyFiles(errorReportsList, sorterInputFolder);
         List<ExceptionMessage> errorMessageList = errorReportsList.stream().map(file -> csvParser.parseFile(file)).collect
                 (Collectors.toList());
-        Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, true),
+        Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, FOLDER_MUST_BE_EMPTY),
                 "Files are not moved from sorter input folder " + sorterInputFolder);
         List<ExceptionMessage> fromDatabaseList = errorMessageList.stream().map(message -> exceptionRepository.findById(message
                 .getId()
