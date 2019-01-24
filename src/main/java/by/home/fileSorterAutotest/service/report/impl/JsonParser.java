@@ -26,10 +26,8 @@ public class JsonParser implements IReportParser<ErrorMessage> {
     @Override
     public ErrorMessage parseFile(File file) {
         String filename = file.getName();
-        log.info("Try to parse csv file {}", filename);
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            ErrorMessage errorMessage = objectMapper.readValue(file, new TypeReference<ErrorMessage>() {
+            ErrorMessage errorMessage = new ObjectMapper().readValue(file, new TypeReference<ErrorMessage>() {
             });
             errorMessage.setFileName(filename);
             errorMessage.setValid(true);

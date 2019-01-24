@@ -93,10 +93,10 @@ public class LocalFileManager {
     public void cleanDirectories(boolean isResources, String... directoryPaths) {
         for (String directoryPath : directoryPaths) {
             try {
-                log.info("Clean directory {}", directoryPath);
                 String folderPath = (isResources) ? FileUtil.getResourcesPath(directoryPath) :
                         directoryPath;
                 FileUtils.cleanDirectory(new File(folderPath));
+                log.info("Clean directory {} - successfully", directoryPath);
             } catch (IOException e) {
                 log.error("Cant clean directory {}, get exception \n {}", directoryPath, e.getMessage());
             }

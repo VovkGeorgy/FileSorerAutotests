@@ -75,8 +75,7 @@ public class ExceptionReportDatabaseTest extends AbstractTestNGSpringContextTest
         Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, FOLDER_MUST_BE_EMPTY),
                 "Files are not moved from sorter input folder " + sorterInputFolder);
         List<ExceptionMessage> fromDatabaseList = errorMessageList.stream().map(message -> exceptionRepository.findById(message
-                .getId()
-        )).map(message -> message.orElseGet(null)).collect(Collectors.toList());
-        Assert.assertTrue(errorMessageList.equals(fromDatabaseList), "Lists of messages entity are not equals");
+                .getId())).map(message -> message.orElseGet(null)).collect(Collectors.toList());
+        Assert.assertEquals(errorMessageList, fromDatabaseList, "Lists of messages entity are not equals");
     }
 }

@@ -104,8 +104,8 @@ public class SftpFileManager {
     public void cleanDirectories(String... directoryPaths) {
         try {
             for (String directoryPath : directoryPaths) {
-                log.info("Delete all files from folder {}", directoryPath);
                 sftpChannel.rm(directoryPath + "*");
+                log.info("Delete all files from folder {} - successfully", directoryPath);
             }
         } catch (SftpException | NullPointerException e) {
             log.error("SFTP Connection process exception {}", e.getMessage());
