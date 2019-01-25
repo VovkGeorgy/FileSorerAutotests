@@ -38,7 +38,7 @@ public class ErrorReportDatabaseTest extends AbstractTestNGSpringContextTests {
     private String sorterInputFolder;
     private int maxWaitingTime;
 
-    @Parameters({"sorterInputFolder", "temporaryFolder", "maxWaitingTime"})
+    @Parameters({"sorterInputFolder", "maxWaitingTime"})
     @BeforeClass
     public void setUp(String sorterInputFolder, int maxWaitingTime) {
         this.sorterInputFolder = sorterInputFolder;

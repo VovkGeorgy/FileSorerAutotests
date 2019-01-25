@@ -1,6 +1,7 @@
 package by.home.fileSorterAutotest.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
  */
 @Data
 @MappedSuperclass
+@EqualsAndHashCode(exclude = {"isValid"})
 public class AbstractMessage {
 
     enum MessageType {
@@ -36,6 +38,6 @@ public class AbstractMessage {
     @Column(name = "file_name")
     protected String fileName;
 
-    @Column(name = "is_valid")
+    @Transient
     protected boolean isValid;
 }

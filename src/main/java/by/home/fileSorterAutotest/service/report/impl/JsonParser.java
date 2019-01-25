@@ -34,7 +34,7 @@ public class JsonParser implements IReportParser<ErrorMessage> {
             log.info("Json file {} is parse successfully", filename);
             return errorMessage;
         } catch (IOException e) {
-            log.error("Cant parse file {}, IOException \n", filename, e.getMessage());
+            log.error("Cant parse file {}, IOException \n {}", filename, e.getMessage());
             return buildNotValidErrorMessage(filename);
         }
     }

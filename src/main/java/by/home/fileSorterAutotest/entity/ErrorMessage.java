@@ -24,4 +24,5 @@ public class ErrorMessage extends AbstractMessage {
     @Enumerated(EnumType.STRING)
     @Column(name = "type_of_error")
     private ErrorType typeOfError;
+
 }
