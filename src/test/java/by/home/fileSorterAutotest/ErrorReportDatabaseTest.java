@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 
 import static by.home.fileSorterAutotest.service.LocalFileManager.FOLDER_MUST_BE_EMPTY;
 
+/**
+ * Class test sorter services for database error report entities saving
+ */
 @Test
 @ContextConfiguration(classes = DataConfig.class, loader = AnnotationConfigContextLoader.class)
 public class ErrorReportDatabaseTest extends AbstractTestNGSpringContextTests {

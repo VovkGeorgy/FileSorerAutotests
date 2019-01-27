@@ -48,13 +48,13 @@ public class LocalFileManager {
      * @return all files in target folder in list
      */
     public List<File> getFiles(String targetFolderPath, boolean isResources) {
+        String folderPath = isResources ? FileUtil.getResourcesPath(targetFolderPath) :
+                targetFolderPath;
         try {
-            String folderPath = isResources ? FileUtil.getResourcesPath(targetFolderPath) :
-                    targetFolderPath;
-            log.info("Try to get files from path \n{}", targetFolderPath);
+            log.info("Try to get files from path \n{}", folderPath);
             return (List<File>) FileUtils.listFiles(new File(folderPath), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
-        } catch (NullPointerException nul) {
-            log.error("Cant get files from path \n{}, get exception \n {}", targetFolderPath, nul.getMessage());
+        } catch (NullPointerException npe) {
+            log.error("Cant get files from path \n{}, get exception \n {}", folderPath, npe.getMessage());
             return new ArrayList<>();
         }
     }
@@ -92,13 +92,13 @@ public class LocalFileManager {
      */
     public void cleanDirectories(boolean isResources, String... directoryPaths) {
         for (String directoryPath : directoryPaths) {
+            String folderPath = (isResources) ? FileUtil.getResourcesPath(directoryPath) :
+                    directoryPath;
             try {
-                String folderPath = (isResources) ? FileUtil.getResourcesPath(directoryPath) :
-                        directoryPath;
                 FileUtils.cleanDirectory(new File(folderPath));
-                log.info("Clean directory {} - successfully", directoryPath);
+                log.info("Clean directory {} - successfully", folderPath);
             } catch (IOException e) {
-                log.error("Cant clean directory {}, get exception \n {}", directoryPath, e.getMessage());
+                log.error("Cant clean directory {}, get exception \n {}", folderPath, e.getMessage());
             }
         }
     }
