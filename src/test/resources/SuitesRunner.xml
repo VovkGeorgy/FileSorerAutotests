@@ -1,0 +1,12 @@
+<suite name="allSuites">
+
+    <parameter name="sorterInputFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/notSorted/"/>
+    <parameter name="maxWaitingTime" value="5"/>
+    <parameter name="temporaryFolder" value="/testReports/error/temporaryFiles/"/>
+    <parameter name="exceptionProcessedFolder" value="D:/Prog/TEMP/WARNINGTestingZone/fileSorter/exceptionFolder/"/>
+
+    <suite-files>
+        <suite-file path="ReportsSorterDatabaseTest.xml" />
+        <suite-file path="ReportsSorterTest.xml" />
+    </suite-files>
+</suite>

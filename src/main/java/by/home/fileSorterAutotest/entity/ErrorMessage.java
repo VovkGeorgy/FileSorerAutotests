@@ -3,9 +3,7 @@ package by.home.fileSorterAutotest.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Error message entity
@@ -16,20 +14,15 @@ import javax.persistence.Table;
 @Table(name = "error_message", schema = "public", catalog = "sorterBase")
 public class ErrorMessage extends AbstractMessage {
 
+    enum ErrorType {
+        STACKOVERFLOW,
+        OUT_OF_MEMORY,
+        LINKAGE,
+        AWT
+    }
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "type_of_error")
-    private String typeOfError;
+    private ErrorType typeOfError;
 
-    public ErrorMessage() {
-    }
-
-    public ErrorMessage(String typeOfError, String messageType, Long id, String message, String throwingTime, String
-            fileName, boolean isValid) {
-        this.typeOfError = typeOfError;
-        this.messageType = messageType;
-        this.id = id;
-        this.message = message;
-        this.throwingTime = throwingTime;
-        this.fileName = fileName;
-        this.isValid = isValid;
-    }
 }

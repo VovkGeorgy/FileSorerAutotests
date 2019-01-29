@@ -18,13 +18,16 @@ import java.util.List;
 @Service
 public class LocalFileManager {
 
+    public static final boolean FOLDER_MUST_BE_EMPTY = true;
+    public static final boolean FOLDER_MUST_NOT_BE_EMPTY = false;
+
     /**
      * Copy files in list to target path
      *
      * @param fileList         list of files
      * @param targetFolderPath path to output folder
      */
-    public void copy(List<File> fileList, String targetFolderPath) {
+    public void copyFiles(List<File> fileList, String targetFolderPath) {
         log.debug("Copy {} files to folder {}", fileList.size(), targetFolderPath);
         fileList.forEach(file -> {
             try {
@@ -42,16 +45,16 @@ public class LocalFileManager {
      *
      * @param targetFolderPath folder target path
      * @param isResources      parameter show than files are resources
-     * @return all files in target folder
+     * @return all files in target folder in list
      */
     public List<File> getFiles(String targetFolderPath, boolean isResources) {
+        String folderPath = isResources ? FileUtil.getResourcesPath(targetFolderPath) :
+                targetFolderPath;
         try {
-            String folderPath = isResources ? FileUtil.getResourcesPath(targetFolderPath) :
-                    targetFolderPath;
-            log.info("Try to get files from path \n{}", targetFolderPath);
+            log.info("Try to get files from path \n{}", folderPath);
             return (List<File>) FileUtils.listFiles(new File(folderPath), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
-        } catch (NullPointerException nul) {
-            log.error("Cant get files from path \n{}, get exception \n {}", targetFolderPath, nul.getMessage());
+        } catch (NullPointerException npe) {
+            log.error("Cant get files from path \n{}, get exception \n {}", folderPath, npe.getMessage());
             return new ArrayList<>();
         }
     }
@@ -89,13 +92,13 @@ public class LocalFileManager {
      */
     public void cleanDirectories(boolean isResources, String... directoryPaths) {
         for (String directoryPath : directoryPaths) {
+            String folderPath = (isResources) ? FileUtil.getResourcesPath(directoryPath) :
+                    directoryPath;
             try {
-                log.info("Clean directory {}", directoryPath);
-                String folderPath = (isResources) ? FileUtil.getResourcesPath(directoryPath) :
-                        directoryPath;
                 FileUtils.cleanDirectory(new File(folderPath));
+                log.info("Clean directory {} - successfully", folderPath);
             } catch (IOException e) {
-                log.error("Cant clean directory {}, get exception \n {}", directoryPath, e.getMessage());
+                log.error("Cant clean directory {}, get exception \n {}", folderPath, e.getMessage());
             }
         }
     }

@@ -18,28 +18,31 @@ import java.io.IOException;
 public class JsonParser implements IReportParser<ErrorMessage> {
 
     /**
-     * Method parse json input file
+     * Method parse input json file
      *
      * @param file input file
-     * @return entity from parsed file
+     * @return entity from parsed file or if cant't parse - return entity only with file name and false validity
      */
     @Override
     public ErrorMessage parseFile(File file) {
         String filename = file.getName();
-        log.info("Try to parse csv file {}", filename);
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            ErrorMessage errorMessage = objectMapper.readValue(file, new TypeReference<ErrorMessage>() {
+            ErrorMessage errorMessage = new ObjectMapper().readValue(file, new TypeReference<ErrorMessage>() {
             });
             errorMessage.setFileName(filename);
             errorMessage.setValid(true);
+            log.info("Json file {} is parse successfully", filename);
             return errorMessage;
         } catch (IOException e) {
-            log.error("Cant parse file {}, IOException \n", filename, e.getMessage());
-            ErrorMessage notValidErrorMessage = new ErrorMessage();
-            notValidErrorMessage.setFileName(filename);
-            notValidErrorMessage.setValid(false);
-            return notValidErrorMessage;
+            log.error("Cant parse file {}, IOException \n {}", filename, e.getMessage());
+            return buildNotValidErrorMessage(filename);
         }
+    }
+
+    private ErrorMessage buildNotValidErrorMessage(String filename) {
+        ErrorMessage notValidErrorMessage = new ErrorMessage();
+        notValidErrorMessage.setFileName(filename);
+        notValidErrorMessage.setValid(false);
+        return notValidErrorMessage;
     }
 }

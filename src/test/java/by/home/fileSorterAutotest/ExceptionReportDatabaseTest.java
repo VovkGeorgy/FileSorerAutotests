@@ -1,8 +1,10 @@
 package by.home.fileSorterAutotest;
 
 import by.home.fileSorterAutotest.config.DataConfig;
+import by.home.fileSorterAutotest.entity.ExceptionMessage;
 import by.home.fileSorterAutotest.repository.ExceptionRepository;
 import by.home.fileSorterAutotest.service.LocalFileManager;
+import by.home.fileSorterAutotest.service.report.IReportParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -14,14 +16,14 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static by.home.fileSorterAutotest.service.LocalFileManager.FOLDER_MUST_NOT_BE_EMPTY;
+import static by.home.fileSorterAutotest.service.LocalFileManager.FOLDER_MUST_BE_EMPTY;
 
 /**
- * Class with tests for exception files sorter
+ * Class test sorter services for database exception report entities saving
  */
 @Test
 @ContextConfiguration(classes = DataConfig.class, loader = AnnotationConfigContextLoader.class)
-public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
+public class ExceptionReportDatabaseTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private LocalFileManager localFileManager;
@@ -29,10 +31,14 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private ExceptionRepository exceptionRepository;
 
+    @Autowired
+    private IReportParser<ExceptionMessage> csvParser;
+
     private String sorterInputFolder;
     private String validExceptionProcessedFolder;
     private String notValidExceptionProcessedFolder;
     private int maxWaitingTime;
+
 
     @Parameters({"sorterInputFolder", "exceptionProcessedFolder", "maxWaitingTime"})
     @BeforeClass
@@ -52,30 +58,26 @@ public class ExceptionReportTest extends AbstractTestNGSpringContextTests {
     }
 
     @DataProvider
-    public Object[][] exceptionReportTest() {
+    public Object[][] exceptionReportDatabaseTest() {
         return new Object[][]{
-                {"/testReports/exception/valid/", validExceptionProcessedFolder},
-                {"/testReports/exception/notValid/", notValidExceptionProcessedFolder}
+                {"/testReports/exception/valid/"}
         };
     }
 
     /**
-     * Test sorter with exception files
+     * Test sorter saving valid exception report message entities in database
      *
-     * @param targetFolder folder from which get test files
-     * @param sorterFolder folder were sorter must put processed files
+     * @param fromFolder folder with valid reports
      */
-    @Test(dataProvider = "exceptionReportTest")
-    public void exceptionReportsSorterOnLocalTest(String targetFolder, String sorterFolder) {
-        List<File> exceptionReportList = localFileManager.getFiles(targetFolder, true);
-        localFileManager.copyFiles(exceptionReportList, sorterInputFolder);
-        Assert.assertFalse(localFileManager.waitFilesTransfer(sorterFolder, maxWaitingTime, FOLDER_MUST_NOT_BE_EMPTY),
-                "Files not found to output sorter folder");
-        List<File> processedFiles = localFileManager.getFiles(sorterFolder, false);
-        List<String> exceptionReportFileNames = exceptionReportList.stream().map(File::getName).collect(Collectors.toList());
-        List<String> processedFilesNames = processedFiles.stream().map(File::getName).collect(Collectors.toList());
-        Assert.assertFalse(processedFiles.isEmpty(), "Not found needed files in output sorter folder " + sorterFolder);
-        Assert.assertEquals(exceptionReportFileNames, processedFilesNames,
-                "Names of files received from output sorter folder and input files are not equals");
+    @Test(dataProvider = "exceptionReportDatabaseTest")
+    public void exceptionReportsSorterInBaseTest(String fromFolder) {
+        List<File> errorReportsList = localFileManager.getFiles(fromFolder, true);
+        localFileManager.copyFiles(errorReportsList, sorterInputFolder);
+        List<ExceptionMessage> errorMessageList = errorReportsList.stream().map(file -> csvParser.parseFile(file)).collect
+                (Collectors.toList());
+        Assert.assertTrue(localFileManager.waitFilesTransfer(sorterInputFolder, maxWaitingTime, FOLDER_MUST_BE_EMPTY),
+                "Files are not moved from sorter input folder " + sorterInputFolder);
+        List<ExceptionMessage> fromDatabaseList = (List<ExceptionMessage>) exceptionRepository.findAll();
+        Assert.assertEquals(errorMessageList, fromDatabaseList, "Lists of messages entity are not equals");
     }
 }

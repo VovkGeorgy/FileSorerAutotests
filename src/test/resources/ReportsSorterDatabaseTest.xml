@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="DatabaseSorterTests">
+
+    <test name="ErrorReportDatabaseTest">
+        <classes>
+            <class name="by.home.fileSorterAutotest.ErrorReportDatabaseTest"/>
+        </classes>
+    </test>
+
+    <test name="ExceptionReportDatabaseTest">
+        <classes>
+            <class name="by.home.fileSorterAutotest.ExceptionReportDatabaseTest"/>
+        </classes>
+    </test>
+
+</suite>
