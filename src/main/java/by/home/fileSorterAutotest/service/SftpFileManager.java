@@ -69,7 +69,9 @@ public class SftpFileManager {
         if (session != null & sftpChannel != null) {
             sftpChannel.exit();
             session.disconnect();
-        } else log.error("Connection statements is NULL");
+            return;
+        }
+        log.error("Connection statements is NULL");
     }
 
     /**
